@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  frontend:
+    build: .
+    working_dir: /workdir/app/frontend
+    volumes:
+      - ./app/frontend:/workdir/app/frontend  # Sync frontend directory with container
+      - /workdir/app/frontend/node_modules
+    command: "npm run dev"  # Starts the frontend development server
+    ports:
+      - "3000:3000"  # Maps port 3000 for frontend (if using React or similar)
+    networks:
+      - app-network
+  backend:
+    build: .
+    working_dir: /workdir/app/backend
+    volumes:
+      - ./app/backend:/workdir/app/backend  # Sync backend directory with container
+    command: "flask run --port 12094 --host 0.0.0.0"  # Starts the backend server
+    ports:
+      - "12094:12094"  # Maps port 5000 for backend
+    networks:
+      - app-network
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - ./db_data:/var/lib/mysql  # Bind mount local folder to MySQL data directory
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
