@@ -1,6 +1,21 @@
 version: '3'
 
 services:
+  db:
+    image: mysql
+    restart: always
+    volumes:
+      - ./db_data:/var/lib/mysql  # Bind mount local folder to MySQL data directory
+      - ./database:/docker-entrypoint-initdb.d  # Run database/createdb.sql at startup (runs ALL .sql files)
+    environment:
+      MYSQL_DATABASE: banking_db # Creates the database at startup
+      MYSQL_USER: banking_user
+      MYSQL_PASSWORD: banking_password
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "3307:3306" # Using 3307 for main machine in case you already have MySQL installed
+    networks:
+      - app-network
   frontend:
     build: .
     working_dir: /workdir/app/frontend
@@ -20,17 +35,6 @@ services:
     command: "flask run --port 12094 --host 0.0.0.0"  # Starts the backend server
     ports:
       - "12094:12094"  # Maps port 5000 for backend
-    networks:
-      - app-network
-  db:
-    image: mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: example
-    volumes:
-      - ./db_data:/var/lib/mysql  # Bind mount local folder to MySQL data directory
-    ports:
-      - "3306:3306"
     networks:
       - app-network
 
