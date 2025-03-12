@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS banking_db;
 USE banking_db;
 
-CREATE TABLE users(
+CREATE TABLE IF NOT EXISTS users(
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	email VARCHAR(50) NOT NULL,
     first_name VARCHAR(50),
@@ -13,7 +13,7 @@ CREATE TABLE users(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE bank_managers(
+CREATE TABLE IF NOT EXISTS bank_managers(
 	id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -21,14 +21,14 @@ CREATE TABLE bank_managers(
     CONSTRAINT unique_user_role UNIQUE(user_id)
 );
 
-CREATE TABLE reports(
+CREATE TABLE IF NOT EXISTS reports(
 	id INT AUTO_INCREMENT PRIMARY KEY,
     manager_id INT,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     report_text TEXT,
     FOREIGN KEY (manager_id) REFERENCES bank_managers(id) ON DELETE CASCADE
 );
-CREATE TABLE accounts(
+CREATE TABLE IF NOT EXISTS accounts(
 	id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     account_type ENUM('savings', 'checking') DEFAULT 'checking',
@@ -39,7 +39,7 @@ CREATE TABLE accounts(
 );
 
 
-CREATE TABLE transactions(
+CREATE TABLE IF NOT EXISTS transactions(
 	id INT AUTO_INCREMENT PRIMARY KEY,
     account_id INT,
     transaction_type ENUM('deposit', 'withdrawal', 'transfer') NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE transactions(
     FOREIGN KEY (destination_account_id) REFERENCES accounts(id) ON DELETE CASCADE
 );
 
-CREATE TABLE bill_payments (
+CREATE TABLE IF NOT EXISTS bill_payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     payee_name VARCHAR(255) NOT NULL,
     payee_account_id INT,
