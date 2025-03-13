@@ -2,43 +2,14 @@ import flask
 import mysql.connector
 from mysql.connector import InternalError
 
-## TEMPORARY DB INIT; REMOVE WHEN docker-compose.yml db VOLUME WORKS AND 
-connection = mysql.connector.connect(
-    host = 'db',            # name same as docker-compose.yml
-    user = 'root',          # default
-    password = 'password',  # default, used to access database with `mysql -u root -p` then input 'password'
-    port = 3306             # default port for mysql, must match with docker-compose.yml
-)
-
-# Make new database if it doesn't already exist
-cursor = connection.cursor()
-cursor.execute("CREATE DATABASE IF NOT EXISTS banking_db")
-connection.database = "banking_db"
-
-# Execute schema.sql
-with open("temp_createdb.sql", "r") as schema_file:
-    schema_sql = schema_file.read()
-    for statement in schema_sql.split(';'):
-        if statement.strip():
-            cursor.execute(statement)
-    print("Executed temp_createdb.sql successfully.")
-
-cursor.execute("SHOW TABLES")
-for table in cursor.fetchall():
-    print(table)
-
-cursor.close()
-connection.close()
-###
-
 ## Connect to db
 def connect_to_db():
     try:
         connection = mysql.connector.connect(
             host = 'db',            # name same as docker-compose.yml
-            user = 'root',          # default
             database = 'banking_db',
-            password = 'password',  # default, used to access database with `mysql -u root -p` then input 'password'
+            user="root",  # Use the root user
+            password="password",  # default, used to access database with `mysql -u root -p` then input 'password'
             port = 3306             # default port for mysql, must match with docker-compose.yml
         )
         return connection
