@@ -1,15 +1,15 @@
 from flask import Blueprint
-from app.services import google_login
+from app.services import google_authorize_service, google_callback_service
 
 auth = Blueprint('auth', __name__)
 
 @auth.route('/google/login')
-def login():
-    return "This is the flagged reviews page"
+def authorize():
+    return google_authorize_service()
 
 @auth.route('/google/callback')
 def callback():
-    return "This is the flagged reviews page"
+    return google_callback_service()
 
 
 @auth.route('/logout')
