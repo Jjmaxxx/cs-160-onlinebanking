@@ -1,0 +1,231 @@
+{
+    "html_attributions": [],
+    "results": [
+      {
+        "business_status": "OPERATIONAL",
+        "geometry": {
+          "location": {
+            "lat": 37.3370501,
+            "lng": -121.8796378
+          },
+          "viewport": {
+            "northeast": {
+              "lat": 37.33859667989272,
+              "lng": -121.8783800201073
+            },
+            "southwest": {
+              "lat": 37.33589702010728,
+              "lng": -121.8810796798927
+            }
+          }
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/atm-71.png",
+        "icon_background_color": "#909CE1",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/atm_pinlet",
+        "name": "Chase ATM",
+        "opening_hours": {
+          "open_now": true
+        },
+        "photos": [
+          {
+            "height": 2988,
+            "html_attributions": [
+              "<a href=\"https://maps.google.com/maps/contrib/105398363989894545478\">Evan Sichler</a>"
+            ],
+            "photo_reference": "AUy1YQ0dzoeYRpstZ9-CTGW_fGPBqNRBTClNA82HfBmFIjU--DTxi6RQueP-Uskt4oKUlp3HLCjnaDlL1VRgfFIBkD2erQ59Jp6k7CDCS9ydqDVjQ2r9xlBAc7GMhQSSgjT4jxdM02oUg2ecUACMkhTzq2kMvCxH6q3W2M0hmW_4QGsV5aWB-7HwNzsgQPct15S72048IUc6RvkxtkahjSYrGyjOINSKUaHFFbuecCkdWuUyVE6RXSwqYkTY2j8dXnL0LwlfItbd-JkXzgzMZed9f16IMd2ptif5HJFosg1Df_GeOmNFiM4",
+            "width": 5312
+          }
+        ],
+        "place_id": "ChIJ_Tx4rbjMj4ARZALLBbgFdFA",
+        "plus_code": {
+          "compound_code": "84PC+R4 San Jose, California",
+          "global_code": "849W84PC+R4"
+        },
+        "rating": 3.6,
+        "reference": "ChIJ_Tx4rbjMj4ARZALLBbgFdFA",
+        "scope": "GOOGLE",
+        "types": [
+          "atm",
+          "finance",
+          "point_of_interest",
+          "establishment"
+        ],
+        "user_ratings_total": 13,
+        "vicinity": "210 S 9th St, San Jose"
+      },
+      {
+        "business_status": "OPERATIONAL",
+        "geometry": {
+          "location": {
+            "lat": 37.33538619999999,
+            "lng": -121.8874047
+          },
+          "viewport": {
+            "northeast": {
+              "lat": 37.33676837989272,
+              "lng": -121.8859652201073
+            },
+            "southwest": {
+              "lat": 37.33406872010728,
+              "lng": -121.8886648798927
+            }
+          }
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/atm-71.png",
+        "icon_background_color": "#909CE1",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/atm_pinlet",
+        "name": "Chase ATM",
+        "opening_hours": {
+          "open_now": false
+        },
+        "place_id": "ChIJHdtZfrzMj4ARUCqhadBllaI",
+        "plus_code": {
+          "compound_code": "84P7+52 San Jose, California",
+          "global_code": "849W84P7+52"
+        },
+        "rating": 1,
+        "reference": "ChIJHdtZfrzMj4ARUCqhadBllaI",
+        "scope": "GOOGLE",
+        "types": [
+          "atm",
+          "finance",
+          "point_of_interest",
+          "establishment"
+        ],
+        "user_ratings_total": 5,
+        "vicinity": "99 E San Fernando St, San Jose"
+      },
+      {
+        "business_status": "OPERATIONAL",
+        "geometry": {
+          "location": {
+            "lat": 37.3328577,
+            "lng": -121.8756032
+          },
+          "viewport": {
+            "northeast": {
+              "lat": 37.33425727989272,
+              "lng": -121.8742787201072
+            },
+            "southwest": {
+              "lat": 37.33155762010728,
+              "lng": -121.8769783798927
+            }
+          }
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/atm-71.png",
+        "icon_background_color": "#909CE1",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/atm_pinlet",
+        "name": "ATM",
+        "place_id": "ChIJmVAajcjMj4ARHIqz6R0K0Ao",
+        "plus_code": {
+          "compound_code": "84MF+4Q San Jose, California",
+          "global_code": "849W84MF+4Q"
+        },
+        "rating": 1,
+        "reference": "ChIJmVAajcjMj4ARHIqz6R0K0Ao",
+        "scope": "GOOGLE",
+        "types": [
+          "atm",
+          "finance",
+          "point_of_interest",
+          "establishment"
+        ],
+        "user_ratings_total": 1,
+        "vicinity": "414 E William St, San Jose"
+      },
+      {
+        "business_status": "OPERATIONAL",
+        "geometry": {
+          "location": {
+            "lat": 37.3314052,
+            "lng": -121.8792432
+          },
+          "viewport": {
+            "northeast": {
+              "lat": 37.33272572989272,
+              "lng": -121.8778711701073
+            },
+            "southwest": {
+              "lat": 37.33002607010727,
+              "lng": -121.8805708298928
+            }
+          }
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/atm-71.png",
+        "icon_background_color": "#909CE1",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/atm_pinlet",
+        "name": "ATM",
+        "place_id": "ChIJe3fb3rfMj4ARrWrl81e8TS4",
+        "plus_code": {
+          "compound_code": "84JC+H7 San Jose, California",
+          "global_code": "849W84JC+H7"
+        },
+        "rating": 0,
+        "reference": "ChIJe3fb3rfMj4ARrWrl81e8TS4",
+        "scope": "GOOGLE",
+        "types": [
+          "atm",
+          "finance",
+          "point_of_interest",
+          "establishment"
+        ],
+        "user_ratings_total": 0,
+        "vicinity": "261 E William St, San Jose"
+      },
+      {
+        "business_status": "OPERATIONAL",
+        "geometry": {
+          "location": {
+            "lat": 37.3353954,
+            "lng": -121.8873727
+          },
+          "viewport": {
+            "northeast": {
+              "lat": 37.33676837989272,
+              "lng": -121.8859652201073
+            },
+            "southwest": {
+              "lat": 37.33406872010728,
+              "lng": -121.8886648798927
+            }
+          }
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/bank-71.png",
+        "icon_background_color": "#909CE1",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/bank-intl_pinlet",
+        "name": "Chase Bank",
+        "opening_hours": {
+          "open_now": false
+        },
+        "photos": [
+          {
+            "height": 3024,
+            "html_attributions": [
+              "<a href=\"https://maps.google.com/maps/contrib/112997492339891923505\">Kaveh Sateri</a>"
+            ],
+            "photo_reference": "AUy1YQ29_lprnE9f0O2AIkSAnU4uwLEriSlM4Y00JYrk3lSEzfv4ZVgrwyghS2kYirHOYVVRM15PuiAl3g9zRi-ngZGC753j8IyBHStMZANiP6QBFdF484U_33ACVo_YtKImNhDLSznw1ZpgJHNKhgT5BD8xibCtaQAnCFVV9YrD0K7rjfcpkwc2cErXPVVpk-zumGxHBtJCNZiiL3M11c3sjZYGIm9vAgMXC_aydU-XR7lw9HjjPkQY5V1LsNa6aqBQPvw6mM1iTr9J10h7OYRe9uCeaeGUTcpOFmP-WHZ77fmSOkZk3GM",
+            "width": 4032
+          }
+        ],
+        "place_id": "ChIJ3zeGzDzNj4AR0vUlP6noFmQ",
+        "plus_code": {
+          "compound_code": "84P7+52 San Jose, California",
+          "global_code": "849W84P7+52"
+        },
+        "rating": 2.5,
+        "reference": "ChIJ3zeGzDzNj4AR0vUlP6noFmQ",
+        "scope": "GOOGLE",
+        "types": [
+          "bank",
+          "atm",
+          "finance",
+          "point_of_interest",
+          "establishment"
+        ],
+        "user_ratings_total": 33,
+        "vicinity": "99 E San Fernando St, San Jose"
+      }
+    ],
+    "status": "OK"
+  }

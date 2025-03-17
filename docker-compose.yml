@@ -31,8 +31,8 @@ services:
     build: .
     working_dir: /workdir/app/backend
     volumes:
-      - ./app/backend:/workdir/app/backend # Sync backend directory with container
-    command: "flask run --port 12094 --host 0.0.0.0" # Starts the backend server
+      - ./app/backend:/workdir/app/backend  # Sync backend directory with container
+    command: "flask run --port 12094 --host 0.0.0.0 --debug"  # Starts the backend server
     ports:
       - "12094:12094" # Maps port 5000 for backend
     depends_on:
