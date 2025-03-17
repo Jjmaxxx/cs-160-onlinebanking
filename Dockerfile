@@ -11,7 +11,6 @@ EXPOSE 5000
 RUN mkdir /workdir
 
 COPY requirements.txt /workdir/requirements.txt
-
 # Install any needed packages specified in requirements.txt
 WORKDIR /workdir
 RUN pip install --no-cache-dir -r requirements.txt

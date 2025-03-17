@@ -1,5 +1,5 @@
 from flask import Blueprint
-from app.services import google_authorize_service, google_callback_service
+from services.auth import google_authorize_service, google_callback_service
 
 auth = Blueprint('auth', __name__)
 
