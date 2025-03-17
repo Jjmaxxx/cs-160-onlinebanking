@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.9-slim
+FROM python:3.12-slim
 
 # Install npm and nodejs
 RUN apt-get update && apt-get install -y npm nodejs
@@ -22,4 +22,3 @@ WORKDIR /workdir/app/frontend
 
 # Install frontend dependencies
 RUN npm install
-
