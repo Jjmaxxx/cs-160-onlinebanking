@@ -11,7 +11,7 @@ import {
 
 import Navbar from '../components/Navbar';
 
-const key = "AIzaSyAP_OSJjcUfA7HQujvo2tv8hH96s4D3HqY";
+const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 async function findChaseAtms(position: Position): Promise<PlacesResponse> {
   const { lat, lng } = position;
@@ -22,9 +22,6 @@ async function findChaseAtms(position: Position): Promise<PlacesResponse> {
   console.log("HEREEEE", json);
   return JSON.parse(json);
 }
-
-window.myfunc = findChaseAtms;
-
 
 interface Position {
   lat: number;
