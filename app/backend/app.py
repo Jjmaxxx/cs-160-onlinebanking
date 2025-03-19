@@ -25,7 +25,7 @@ def teardown(exception):
         db_connection.close() 
 
 
-GOOGLE_MAPS_API_KEY = "AIzaSyAP_OSJjcUfA7HQujvo2tv8hH96s4D3HqY"
+GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
 GOOGLE_MAPS_API_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 
 cached_response = None
