@@ -47,7 +47,7 @@ def proxy_request():
     #     app.logger.warn("Using cached response")
     
     # app.logger.warn("Returning response: %s", cached_response)
-    with open("./response.json", "r") as f:
+    with open("./sjsu_chase_atm_response.json", "r") as f:
         cached_response = f.read()
     app.logger.warn("Returning response: %s", cached_response)
     return jsonify(cached_response)
