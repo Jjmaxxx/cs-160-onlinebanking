@@ -12,7 +12,7 @@ app.register_blueprint(auth, url_prefix='/auth')
 
 
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
-CORS(app, resources={r"/*": {"origins": os.getenv('FRONTEND_URL')}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.before_request
 def before_request():
