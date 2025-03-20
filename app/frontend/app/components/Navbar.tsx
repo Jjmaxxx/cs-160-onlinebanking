@@ -2,9 +2,7 @@
 function Navbar() {
   const handleGoogleLogin = async () => {
     try {
-      await fetch('http://localhost:12094/auth/google/login', {
-        method: 'GET',
-      });
+      window.location.href = "http://localhost:12094/auth/google/login";
     } catch (error) {
       console.error('Error during Google login request:', error);
     }
