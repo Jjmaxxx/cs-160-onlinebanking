@@ -11,16 +11,17 @@ import {
 
 import Navbar from '../components/Navbar';
 
-const key = "AIzaSyCDWZu208UegYXgjUb_PJefDjBorns-3qE";
+const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 async function findChaseAtms(position: Position): Promise<PlacesResponse> {
   const { lat, lng } = position;
-  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1000&type=atm&keyword=chase&key=${key}`;
+  const url = `http://localhost:12094/nearbysearch_proxy?location=${lat},${lng}&radius=1000&type=atm&keyword=chase`;
   
   const response = await fetch(url);
-  return response.json();
+  const json = await response.json();
+  console.log("HEREEEE", json);
+  return JSON.parse(json);
 }
-
 
 interface Position {
   lat: number;
@@ -47,16 +48,25 @@ export default function Intro() {
   const [selectedAtm, setSelectedAtm] = useState<Position | null>(null);
 
   useEffect(() => {
+    console.log("Getting user location...");
     if (navigator.geolocation) {
+      console.log("Getting user location...2");
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
+          console.log("Getting user location...3");
           const { latitude, longitude } = pos.coords;
           const userPosition = { lat: latitude, lng: longitude };
           setPosition(userPosition);
 
           // Fetch ATM locations
+          console.log("Getting user location...4");
           const atmData = await findChaseAtms(userPosition);
+          console.log("atmData: ", atmData);
+          console.log("atmData.results: ", atmData.results);
+
           const atmLocations = atmData.results.map((atm) => atm.geometry.location);
+          console.log("ATM LOCATIONS");
+          console.log(atmLocations);
           setAtms(atmLocations);
         },
         (error) => {
