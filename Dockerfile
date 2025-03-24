@@ -22,4 +22,3 @@ WORKDIR /workdir/app/frontend
 
 # Install frontend dependencies
 RUN npm install
-
