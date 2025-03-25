@@ -5,7 +5,7 @@ import google.oauth2.credentials
 import os
 from dotenv import load_dotenv  
 load_dotenv()
-from daos.auth import add_user_to_db
+from daos.auth import add_user
 
 CLIENT_SECRETS_FILE = '/workdir/app/backend/client_secret.json'
 SCOPES = [
@@ -58,7 +58,7 @@ def google_callback_service():
     access_token = credentials.get('token')
     user_info = get_user_info(access_token)
     email: str = user_info.get("email")
-    add_user_to_db(email)
+    add_user(email)
     frontend_url = os.getenv("FRONTEND_URL")
     response = flask.make_response(flask.redirect(frontend_url))
     response.set_cookie('access_token', access_token)

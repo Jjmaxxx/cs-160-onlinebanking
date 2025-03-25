@@ -1,9 +1,10 @@
-from flask import Flask, g, jsonify
+from flask import Flask, g, jsonify, request
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 from db import get_db_connection
 from views.auth import auth
+from middlewares.auth_middleware import authenticate
 import requests
 
 load_dotenv()
@@ -13,6 +14,13 @@ app.register_blueprint(auth, url_prefix='/auth')
 
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
 CORS(app, resources={r"/*": {"origins": "*"}})
+
+
+@app.route("/example_protected_route")
+@authenticate
+def protected_route():
+    print(request.user)
+    return jsonify({"message": f"Hi logged in user, {request.user['email']}!"})
 
 @app.before_request
 def before_request():
