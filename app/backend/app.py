@@ -13,7 +13,7 @@ app.register_blueprint(auth, url_prefix='/auth')
 
 
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 
 @app.route("/example_protected_route")
