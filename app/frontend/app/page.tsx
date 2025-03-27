@@ -36,7 +36,7 @@ export default function Intro() {
   return (
     <div>
         <Navbar />
-        {user ? <p>Welcome, {user.email}</p> : <p>Not logged in</p>}
+        {user ? <p>{user.message}</p> : <p>Not logged in</p>}
     </div>
   );
 }
