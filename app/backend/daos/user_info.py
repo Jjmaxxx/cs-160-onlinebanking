@@ -16,6 +16,16 @@ CREATE TABLE IF NOT EXISTS users(
     city VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS accounts(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    account_type ENUM('savings', 'checking') DEFAULT 'checking',
+    balance DECIMAL(15, 2) DEFAULT 0.00,
+    account_status ENUM('active', 'suspended', 'closed') DEFAULT 'active',
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 """
 
 def update_user_info(user_id: int, first_name: str = None, last_name: str = None, address: str = None, zip_code: str = None, state: str = None, city: str = None):
@@ -35,3 +45,21 @@ def update_user_info(user_id: int, first_name: str = None, last_name: str = None
     logger().debug("Updating user info for with values: %s", values)
  
     return execute_query(query, values)
+
+def get_user_accounts(user_id: int):
+    """
+    Retrieve all accounts for a given user that are open.
+    """
+    query = '''
+        SELECT * FROM accounts
+        WHERE user_id = %s AND account_status = 'active';
+    '''
+
+    logger().debug("Fetching accounts for user_id: %s", user_id)
+
+    accounts = fetch_all(query, (user_id,))
+
+    if not accounts:
+        logger().debug("No active accounts found for user_id: %s", user_id)
+
+    return accounts

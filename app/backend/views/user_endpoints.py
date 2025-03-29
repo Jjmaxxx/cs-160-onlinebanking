@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from daos.auth import get_user
-from daos.user_info import update_user_info
+from daos.user_info import update_user_info, get_user_accounts
 from middlewares.auth_middleware import authenticate
 from services.logger import logger
 
@@ -37,4 +37,22 @@ def update_user_endpoint():
 
     # Return a success message
     return jsonify({"message": "User info updated successfully", "user": user})
+
+@endpoints.route("/accounts", methods=["GET"])
+@authenticate
+def get_user_accounts_endpoint():
+    """
+    Endpoint to get all accounts for the authenticated user.
+    """
+    user = request.user
+    logger().debug("HELLO: %s", user)
+
+    # Get user accounts
+    accounts = get_user_accounts(user['id'])
+
+    if not accounts:
+        return jsonify({"message": "No active accounts found for this user."}), 400
+
+    # Return the accounts
+    return jsonify({"accounts": accounts})
 
