@@ -4,17 +4,18 @@ import os
 from dotenv import load_dotenv
 from db import get_db_connection
 from views.auth import auth
+from views.user_endpoints import endpoints as user_endpoints
 from middlewares.auth_middleware import authenticate
 import requests
 
 load_dotenv()
 app = Flask(__name__)
 app.register_blueprint(auth, url_prefix='/auth')
-
+app.register_blueprint(user_endpoints, url_prefix='/user')
 
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
+app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
-
 
 @app.route("/example_protected_route")
 @authenticate
@@ -31,7 +32,6 @@ def teardown(exception):
     db_connection = getattr(g, 'db_connection', None)
     if db_connection is not None:
         db_connection.close() 
-
 
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
 GOOGLE_MAPS_API_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
