@@ -26,6 +26,18 @@ CREATE TABLE IF NOT EXISTS accounts(
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS transactions(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT,
+    transaction_type ENUM('deposit', 'withdrawal', 'transfer') NOT NULL,
+    amount DECIMAL(15, 2) NOT NULL CHECK (amount >= 0),
+	transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transaction_status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
+    destination_account_id INT DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (destination_account_id) REFERENCES accounts(id) ON DELETE CASCADE
+);
 """
 
 def get_account(id_):
@@ -94,7 +106,12 @@ def close_account(id_: int):
 def deposit_to_account(id_: int, amount: float):
     """
     Deposit money into an account by updating the balance.
+    Ensure the deposit amount is positive.
     """
+    if amount <= 0:
+        logger().debug("Deposit amount must be greater than 0")
+        return False
+    
     query = '''
         UPDATE accounts
         SET balance = balance + %s
@@ -102,6 +119,11 @@ def deposit_to_account(id_: int, amount: float):
     '''
     
     logger().debug("Depositing %s to account id: %s", amount, id_)
+
+    execute_query('''
+        INSERT INTO transactions (account_id, transaction_type, amount, transaction_status)
+        VALUES (%s, %s, %s, %s);
+    ''', (id_, 'deposit', amount, 'completed'))
     
     # Execute the query
     execute_query(query, (amount, id_))
@@ -118,16 +140,14 @@ def withdraw_from_account(id_: int, amount: float):
     '''
     
     logger().debug("Withdrawing %s from account id: %s", amount, id_)
+
+    execute_query('''
+        INSERT INTO transactions (account_id, transaction_type, amount, transaction_status)
+        VALUES (%s, %s, %s, %s);
+    ''', (id_, 'withdrawal', amount, 'completed'))
     
-    # Execute the query
-    result = execute_query(query, (amount, id_, amount))
+    execute_query(query, (amount, id_, amount))
     
-    if result:
-        logger().debug("Withdrawal successful for account id: %s", id_)
-    else:
-        logger().debug("Failed to withdraw from account id: %s", id_)
-    
-    return result
 
 def check_user_owns_account(user_id: int, account_id: int):
     """
