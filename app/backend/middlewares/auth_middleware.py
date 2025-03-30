@@ -2,6 +2,7 @@ from flask import request, jsonify
 from functools import wraps
 import requests
 from daos.auth import get_user
+from daos.account import check_user_owns_account
 from services.logger import logger
 import sys
 
@@ -26,11 +27,11 @@ def authenticate(f):
         logger().debug("Checking authentication for request")
         access_token = request.cookies.get("access_token")
         if not access_token:
-            logger().debug("Checking authentication for request")
+            logger().debug("no access token")
             return jsonify({"error": "Missing access token"}), 401
         token_info = checkToken(access_token)
         if not token_info:
-            logger().debug("Checking authentication for request")
+            logger().debug("Invalid access token: %s", access_token)
             return jsonify({"error": "Invalid access token"}), 401
         email = token_info.get("email")
         if not email:
@@ -47,3 +48,23 @@ def authenticate(f):
         return f(*args, **kwargs)
 
     return check_auth
+
+
+def account_authorization(func):
+    """
+    Decorator to check if the user owns the account they are trying to access.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        account_id = request.args.get('account_id')
+        if not account_id:
+            return jsonify({"error": "Account ID is required"}), 400
+        
+        if request.args.get('debug') is not None:
+            return func(*args, **kwargs)
+        
+        if not check_user_owns_account(request.user['id'], int(account_id)):
+            return jsonify({"error": "You do not own this account"}), 403
+        
+        return func(*args, **kwargs)
+    return wrapper

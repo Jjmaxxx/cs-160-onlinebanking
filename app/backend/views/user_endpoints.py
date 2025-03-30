@@ -50,9 +50,6 @@ def get_user_accounts_endpoint():
     # Get user accounts
     accounts = get_user_accounts(user['id'])
 
-    if not accounts:
-        return jsonify({"message": "No active accounts found for this user."}), 400
-
     # Return the accounts
     return jsonify({"accounts": accounts})
 

@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from db import get_db_connection
 from views.auth import auth
 from views.user_endpoints import endpoints as user_endpoints
+from views.account_endpoints import endpoints as account_endpoints
 from middlewares.auth_middleware import authenticate
 import requests
 
@@ -12,6 +13,7 @@ load_dotenv()
 app = Flask(__name__)
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(user_endpoints, url_prefix='/user')
+app.register_blueprint(account_endpoints, url_prefix='/accounts')
 
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
 app.config['CORS_HEADERS'] = 'Content-Type'
