@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify, request
+from daos.user_info import user_id_by_email
 from daos.account import (
     get_account,
     open_account,
     close_account,
     deposit_to_account,
     withdraw_from_account,
+    transfer_funds,
 )
 from middlewares.auth_middleware import authenticate, account_authorization
 
@@ -84,3 +86,31 @@ def withdraw_endpoint():
     withdraw_from_account(int(account_id), amount)
 
     return jsonify({"message": "Withdrawal successful"})
+
+@endpoints.route("/transfer") # Have not tested this endpoint yet
+@authenticate
+@account_authorization
+def transfer_endpoint():
+    """
+    Endpoint to transfer money between two accounts.
+    """
+    source_account_id = request.args.get('account_id')
+    destination_email = request.args.get('destination_email')
+    destination_account_id = user_id_by_email(destination_email)
+
+    if destination_account_id is None:
+        return jsonify({"error": "Destination account not found"}), 400
+
+    amount = request.args.get('amount', type=float)
+
+    if amount is None or amount <= 0:
+        return jsonify({"error": "Invalid transfer amount"}), 400
+
+    source_balance = get_account(source_account_id).get('balance', 0)
+
+    if amount > source_balance:
+        return jsonify({"error": "Insufficient funds for transfer"}), 400
+
+    transfer_funds(int(source_account_id), int(destination_account_id), amount)
+
+    return jsonify({"message": "Transfer successful"})

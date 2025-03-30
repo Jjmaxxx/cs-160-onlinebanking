@@ -103,7 +103,7 @@ def close_account(id_: int):
     
     return result
 
-def deposit_to_account(id_: int, amount: float):
+def deposit_to_account(id_: int, amount: float, record_transaction: bool = True):
     """
     Deposit money into an account by updating the balance.
     Ensure the deposit amount is positive.
@@ -120,15 +120,16 @@ def deposit_to_account(id_: int, amount: float):
     
     logger().debug("Depositing %s to account id: %s", amount, id_)
 
-    execute_query('''
-        INSERT INTO transactions (account_id, transaction_type, amount, transaction_status)
-        VALUES (%s, %s, %s, %s);
-    ''', (id_, 'deposit', amount, 'completed'))
+    if record_transaction:
+        execute_query('''
+            INSERT INTO transactions (account_id, transaction_type, amount, transaction_status)
+            VALUES (%s, %s, %s, %s);
+        ''', (id_, 'deposit', amount, 'completed'))
     
     # Execute the query
     execute_query(query, (amount, id_))
 
-def withdraw_from_account(id_: int, amount: float):
+def withdraw_from_account(id_: int, amount: float, record_transaction: bool = True):
     """
     Withdraw money from an account by updating the balance.
     Ensure the withdrawal does not exceed the current balance.
@@ -141,13 +142,31 @@ def withdraw_from_account(id_: int, amount: float):
     
     logger().debug("Withdrawing %s from account id: %s", amount, id_)
 
-    execute_query('''
-        INSERT INTO transactions (account_id, transaction_type, amount, transaction_status)
-        VALUES (%s, %s, %s, %s);
-    ''', (id_, 'withdrawal', amount, 'completed'))
+    if record_transaction:
+        execute_query('''
+            INSERT INTO transactions (account_id, transaction_type, amount, transaction_status)
+            VALUES (%s, %s, %s, %s);
+        ''', (id_, 'withdrawal', amount, 'completed'))
     
     execute_query(query, (amount, id_, amount))
-    
+
+def transfer_funds(source_account_id: int, destination_account_id: int, amount: float):
+    """
+    Transfer funds from one account to another.
+    Ensure the transfer amount is positive and sufficient funds are available in the source account.
+    """
+
+    # Withdraw from source account
+    withdraw_from_account(source_account_id, amount, record_transaction=False)
+
+    # Deposit to destination account
+    deposit_to_account(destination_account_id, amount, record_transaction=False)
+
+    # Record the transaction for both accounts
+    execute_query('''
+        INSERT INTO transactions (account_id, transaction_type, amount, transaction_status, destination_account_id)
+        VALUES (%s, %s, %s, %s, %s);
+    ''', (source_account_id, 'transfer', amount, 'completed', destination_account_id))
 
 def check_user_owns_account(user_id: int, account_id: int):
     """

@@ -63,3 +63,24 @@ def get_user_accounts(user_id: int):
         logger().debug("No active accounts found for user_id: %s", user_id)
 
     return accounts
+
+def user_id_by_email(email: str):
+    """
+    Retrieve the user ID by email address.
+    """
+    query = '''
+        SELECT id FROM users
+        WHERE email = %s;
+    '''
+    
+    logger().debug("Fetching user ID for email: %s", email)
+    
+    user = fetch_one(query, (email,))
+    
+    if not user:
+        logger().debug("No user found for email: %s", email)
+        return None
+    
+    logger().debug("Found user ID: %s for email: %s", user['id'], email)
+    
+    return user['id']
