@@ -7,6 +7,7 @@ from daos.account import (
     deposit_to_account,
     withdraw_from_account,
     transfer_funds,
+    user_checking_account
 )
 from middlewares.auth_middleware import authenticate, account_authorization
 
@@ -59,7 +60,7 @@ def deposit_endpoint():
     amount = request.args.get('amount', type=float)
  
     if amount is None or amount <= 0:
-        return jsonify({"error": "Invalid deposit amount"}), 400
+        return jsonify({"message": "Invalid deposit amount"}), 400
 
     deposit_to_account(int(account_id), amount)
 
@@ -96,10 +97,21 @@ def transfer_endpoint():
     """
     source_account_id = request.args.get('account_id')
     destination_email = request.args.get('destination_email')
-    destination_account_id = user_id_by_email(destination_email)
+    destination_account_id = request.args.get('destination_account_id')
 
-    if destination_account_id is None:
-        return jsonify({"error": "Destination account not found"}), 400
+    if not destination_account_id and not destination_email:
+        return jsonify({"error": "Either destination account ID or destination email must be provided"}), 400
+
+    if destination_email:
+        destination_user_id = user_id_by_email(destination_email)
+
+        if destination_user_id is None:
+            return jsonify({"error": "Recieving user not found"}), 400
+ 
+        destination_account_id = user_checking_account(destination_user_id).get('id')
+
+        if not destination_account_id:
+            return jsonify({"error": "Recieving user does not have a checking account"}), 400
 
     amount = request.args.get('amount', type=float)
 

@@ -58,6 +58,25 @@ def get_account(id_):
     
     return account
 
+def user_checking_account(user_id: int):
+    """
+    Retrieve a checking account for a user.
+    This will return the first checking account found for the user.
+    """
+    query = '''
+        SELECT * FROM accounts
+        WHERE user_id = %s AND account_type = 'checking' AND account_status = 'active';
+    '''
+    
+    logger().debug("Fetching checking account for user_id: %s", user_id)
+    
+    account = fetch_one(query, (user_id,))
+    
+    if not account:
+        logger().debug("No active checking account found for user_id: %s", user_id)
+    
+    return account
+
 def open_account(user_id: int, account_type: str = 'checking'):
     """
     Open a new account for a user with the specified account type.
@@ -167,6 +186,11 @@ def transfer_funds(source_account_id: int, destination_account_id: int, amount: 
         INSERT INTO transactions (account_id, transaction_type, amount, transaction_status, destination_account_id)
         VALUES (%s, %s, %s, %s, %s);
     ''', (source_account_id, 'transfer', amount, 'completed', destination_account_id))
+
+    logger().debug(
+        "Transferred %s from account id: %s to account id: %s",
+        amount, source_account_id, destination_account_id
+    )
 
 def check_user_owns_account(user_id: int, account_id: int):
     """
