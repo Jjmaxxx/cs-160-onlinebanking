@@ -2,57 +2,25 @@
 export async function deposit(account_id, amount) {
     let data = await make_request(`http://localhost:12094/accounts/deposit?account_id=${account_id}&amount=${amount}`, "GET");
 
-    if (data.error) {
-        return `Error: ${data.error}`;
-    }
-
-    if (data.message) {
-        return data.message;
-    }
-
-    return "Something went wrong";
+    return data.message;
   }
 
  export async function withdraw(account_id, amount) {
     let data = await make_request(`http://localhost:12094/accounts/withdraw?account_id=${account_id}&amount=${amount}`, "GET");
 
-    if (data.error) {
-        return `Error: ${data.error}`;
-    }
-
-    if (data.message) {
-        return data.message;
-    }
-
-    return "Something went wrong";
+    return data.message;
   }
 
   export async function transferToEmail(from_account_id, to_email, amount) {
     let data = await make_request(`http://localhost:12094/accounts/transfer?account_id=${from_account_id}&destination_email=${to_email}&amount=${amount}`, "GET");
 
-    if (data.error) {
-        return `Error: ${data.error}`;
-    }
-
-    if (data.message) {
-        return data.message;
-    }
-
-    return "Something went wrong";
+    return data.message;
   }
 
   export async function transferToSelf(from_account_id, to_account_id, amount) {
     let data = await make_request(`http://localhost:12094/accounts/transfer?account_id=${from_account_id}&destination_account_id=${to_account_id}&amount=${amount}`, "GET");
 
-    if (data.error) {
-        return `Error: ${data.error}`;
-    }
-
-    if (data.message) {
-        return data.message;
-    }
-
-    return "Something went wrong";
+    return data.message;
   }
 
   async function make_request(url, method = "GET", body = null) {
@@ -77,7 +45,7 @@ export async function deposit(account_id, amount) {
       return data;
     } catch (error) {
       return {
-        error: error.message || "Network error",
+        message: error.message || "An error occurred",
       }; // Return an object with the error message
     }
   }
