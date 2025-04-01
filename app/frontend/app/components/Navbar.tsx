@@ -13,6 +13,7 @@ function Navbar() {
           <a href="/" className="hover:text-gray-400">Home</a>
           <a href="/maps" className="hover:text-gray-400">Find ATMs</a>
           <a href="#" className="hover:text-gray-400">Contact</a>
+          <a href="/transact" className="hover:text-gray-400">Transact</a>
           <a href="#" onClick={handleGoogleLogin} className="hover:text-gray-400">Login with Google</a>
         </div>
       </nav>);

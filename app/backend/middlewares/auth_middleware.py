@@ -1,7 +1,11 @@
-from flask import request, jsonify
+from flask import request, jsonify 
 from functools import wraps
 import requests
 from daos.auth import get_user
+from daos.account import check_user_owns_account
+from services.logger import logger
+import sys
+
 
 def checkToken(access_token):
     try:
@@ -20,20 +24,47 @@ def checkToken(access_token):
 def authenticate(f):
     @wraps(f)
     def check_auth(*args, **kwargs):
+        logger().debug("Checking authentication for request")
         access_token = request.cookies.get("access_token")
         if not access_token:
+            logger().debug("no access token")
             return jsonify({"error": "Missing access token"}), 401
         token_info = checkToken(access_token)
         if not token_info:
+            logger().debug("Invalid access token: %s", access_token)
             return jsonify({"error": "Invalid access token"}), 401
         email = token_info.get("email")
         if not email:
+            logger().debug("Checking authentication for request")
             return jsonify({"error": "Invalid token: email missing"}), 401
         try:
             user = get_user(email=email)
-        except:
+        except Exception as e:
+            logger().debug("Error fetching user from database: %s", str(e))
             return jsonify({"error": "Cannot find user in database."}), 401
+
         request.user = user
+        logger().debug("Authenticated user: %s", request.user)
         return f(*args, **kwargs)
 
     return check_auth
+
+
+def account_authorization(func):
+    """
+    Decorator to check if the user owns the account they are trying to access.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        account_id = request.args.get('account_id')
+        if not account_id:
+            return jsonify({"error": "Account ID is required"}), 400
+        
+        if request.args.get('debug') is not None:
+            return func(*args, **kwargs)
+        
+        if not check_user_owns_account(request.user['id'], int(account_id)):
+            return jsonify({"error": "You do not own this account"}), 403
+        
+        return func(*args, **kwargs)
+    return wrapper
