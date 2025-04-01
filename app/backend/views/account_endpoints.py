@@ -59,10 +59,10 @@ def deposit_endpoint():
     account_id = request.args.get('account_id')
     amount = request.args.get('amount', type=float)
  
-    if amount is None or amount <= 0:
-        return jsonify({"message": "Invalid deposit amount"}), 400
-
-    deposit_to_account(int(account_id), amount)
+    try:
+        deposit_to_account(int(account_id), amount)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
     return jsonify({"message": "Deposit successful"})
 
@@ -76,15 +76,10 @@ def withdraw_endpoint():
     account_id = request.args.get('account_id')
     amount = request.args.get('amount', type=float)
 
-    if amount is None or amount <= 0:
-        return jsonify({"error": "Invalid withdrawal amount"}), 400
-    
-    balance = get_account(account_id).get('balance', 0)
-
-    if amount > balance:
-        return jsonify({"error": "Insufficient funds for withdrawal"}), 400
-
-    withdraw_from_account(int(account_id), amount)
+    try:
+        withdraw_from_account(int(account_id), amount)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
     return jsonify({"message": "Withdrawal successful"})
 
@@ -115,14 +110,9 @@ def transfer_endpoint():
 
     amount = request.args.get('amount', type=float)
 
-    if amount is None or amount <= 0:
-        return jsonify({"error": "Invalid transfer amount"}), 400
-
-    source_balance = get_account(source_account_id).get('balance', 0)
-
-    if amount > source_balance:
-        return jsonify({"error": "Insufficient funds for transfer"}), 400
-
-    transfer_funds(int(source_account_id), int(destination_account_id), amount)
+    try:
+        transfer_funds(int(source_account_id), int(destination_account_id), amount)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
     return jsonify({"message": "Transfer successful"})

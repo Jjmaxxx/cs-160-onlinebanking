@@ -86,10 +86,6 @@ def open_account(user_id: int, account_type: str = 'checking'):
         VALUES (%s, %s);
     '''
     
-    # Default to checking if no type is provided
-    if account_type not in ['savings', 'checking']:
-        account_type = 'checking'
-    
     logger().debug("Opening account for user_id: %s with account_type: %s", user_id, account_type)
     
     # Execute the query
@@ -128,8 +124,7 @@ def deposit_to_account(id_: int, amount: float, record_transaction: bool = True)
     Ensure the deposit amount is positive.
     """
     if amount <= 0:
-        logger().debug("Deposit amount must be greater than 0")
-        return False
+        raise Exception("Deposit amount must be greater than 0")
     
     query = '''
         UPDATE accounts
@@ -139,27 +134,37 @@ def deposit_to_account(id_: int, amount: float, record_transaction: bool = True)
     
     logger().debug("Depositing %s to account id: %s", amount, id_)
 
+    execute_query(query, (amount, id_))
+
     if record_transaction:
         execute_query('''
             INSERT INTO transactions (account_id, transaction_type, amount, transaction_status)
             VALUES (%s, %s, %s, %s);
         ''', (id_, 'deposit', amount, 'completed'))
     
-    # Execute the query
-    execute_query(query, (amount, id_))
+    return True
 
 def withdraw_from_account(id_: int, amount: float, record_transaction: bool = True):
     """
     Withdraw money from an account by updating the balance.
     Ensure the withdrawal does not exceed the current balance.
     """
+
+    logger().debug("Withdrawing %s from account id: %s", amount, id_)
+
+    balance = get_account(id_).get('balance', 0)
+    if balance < amount:
+        raise Exception("Insufficient funds for withdrawal")
+    
+    if amount <= 0:
+        raise Exception("Withdrawal amount must be greater than 0")
+
     query = '''
         UPDATE accounts
         SET balance = balance - %s
         WHERE id = %s AND account_status = 'active' AND balance >= %s;
     '''
-    
-    logger().debug("Withdrawing %s from account id: %s", amount, id_)
+    execute_query(query, (amount, id_, amount))
 
     if record_transaction:
         execute_query('''
@@ -167,7 +172,7 @@ def withdraw_from_account(id_: int, amount: float, record_transaction: bool = Tr
             VALUES (%s, %s, %s, %s);
         ''', (id_, 'withdrawal', amount, 'completed'))
     
-    execute_query(query, (amount, id_, amount))
+    return True
 
 def transfer_funds(source_account_id: int, destination_account_id: int, amount: float):
     """
