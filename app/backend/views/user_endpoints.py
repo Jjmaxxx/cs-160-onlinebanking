@@ -8,6 +8,11 @@ from services.logger import logger
 
 endpoints = Blueprint('user_endpoints', __name__)
 
+@endpoints.route("/authorized")
+@authenticate
+def check_authorization():
+    return jsonify({"authorized": True}), 200
+
 @endpoints.route("/info")
 @authenticate
 def get_user_endpoint():
@@ -22,10 +27,9 @@ def logout_user():
     frontend_url = os.getenv("FRONTEND_URL")
     response = flask.make_response(jsonify({"message": "User logged out successfully"}))
     response.set_cookie('access_token', '', expires=0)
+    response.set_cookie('session', '', expires=0)
 
     return response
-
-    
 
 @endpoints.route("/update", methods=["GET", "POST"])
 @authenticate
