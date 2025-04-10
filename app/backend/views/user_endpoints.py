@@ -1,3 +1,5 @@
+import flask
+import os
 from flask import Blueprint, jsonify, request
 from daos.auth import get_user
 from daos.user_info import update_user_info, get_user_accounts
@@ -12,6 +14,18 @@ def get_user_endpoint():
     user = get_user(request.user['email'])
 
     return jsonify(user)
+
+@endpoints.route("/logout", methods=["GET"])
+@authenticate
+def logout_user():
+    # Clear cookies
+    frontend_url = os.getenv("FRONTEND_URL")
+    response = flask.make_response(jsonify({"message": "User logged out successfully"}))
+    response.set_cookie('access_token', '', expires=0)
+
+    return response
+
+    
 
 @endpoints.route("/update", methods=["GET", "POST"])
 @authenticate
