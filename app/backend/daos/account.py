@@ -213,3 +213,23 @@ def check_user_owns_account(user_id: int, account_id: int):
         return True
     else:
         return False
+
+def get_user_transactions(user_id: int):
+    """
+    Retrieve all transactions for a user.
+    """
+    query = '''
+        SELECT * FROM transactions
+        WHERE account_id IN (
+            SELECT id FROM accounts WHERE user_id = %s
+        );
+    '''
+    
+    logger().debug("Fetching transactions for user_id: %s", user_id)
+    
+    transactions = fetch_all(query, (user_id,))
+    
+    if not transactions:
+        logger().debug("No transactions found for user_id: %s", user_id)
+    
+    return transactions
