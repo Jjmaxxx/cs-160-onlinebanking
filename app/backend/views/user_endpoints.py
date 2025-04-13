@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from daos.auth import get_user
 from daos.user_info import update_user_info, get_user_accounts
+from daos.account import get_user_transactions
 from middlewares.auth_middleware import authenticate
 from services.logger import logger
 
@@ -52,4 +53,18 @@ def get_user_accounts_endpoint():
 
     # Return the accounts
     return jsonify({"accounts": accounts})
+
+@endpoints.route("/transactions")
+@authenticate
+def get_user_transactions_endpoint():
+    """
+    Endpoint to get all transactions for the authenticated user.
+    """
+    user = request.user
+
+    # Get user transactions
+    transactions = get_user_transactions(user['id'])
+
+    # Return the transactions
+    return jsonify({"transactions": transactions})
 
