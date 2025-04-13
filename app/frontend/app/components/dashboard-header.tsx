@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ModeToggle } from "@/components/mode-toggle"
+import { ModeToggle } from "./mode-toggle"
 
 interface DashboardHeaderProps {
   onMenuClick: () => void

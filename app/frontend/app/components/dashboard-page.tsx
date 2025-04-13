@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { DashboardHeader } from "@/components/dashboard-header"
-import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { AccountOverview } from "@/components/account-overview"
-import { RecentTransactions } from "@/components/recent-transactions"
-import { QuickActions } from "@/components/quick-actions"
-import { FinancialInsights } from "@/components/financial-insights"
-import { UpcomingBills } from "@/components/upcoming-bills"
+import { DashboardHeader } from "./dashboard-header"
+import { DashboardSidebar } from "./dashboard-sidebar"
+import { AccountOverview } from "./account-overview"
+import { RecentTransactions } from "./recent-transactions"
+import { QuickActions } from "./quick-actions"
+import { FinancialInsights } from "./financial-insights"
+import { UpcomingBills } from "./upcoming-bills"
 
 export function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
