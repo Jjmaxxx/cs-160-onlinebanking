@@ -1,4 +1,5 @@
 import flask
+from flask import jsonify
 import google_auth_oauthlib.flow
 import requests
 import google.oauth2.credentials
@@ -62,4 +63,12 @@ def google_callback_service():
     frontend_url = os.getenv("FRONTEND_URL")
     response = flask.make_response(flask.redirect(frontend_url))
     response.set_cookie('access_token', access_token)
+    return response
+
+
+def logout_user():
+    response = flask.make_response(jsonify({"message": "User logged out successfully"}))
+    response.set_cookie('access_token', '', expires=0)
+    response.set_cookie('session', '', expires=0)
+    
     return response
