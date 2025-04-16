@@ -1,10 +1,18 @@
+import flask
+import os
 from flask import Blueprint, jsonify, request
 from daos.auth import get_user
 from daos.user_info import update_user_info, get_user_accounts
+from daos.account import get_user_transactions
 from middlewares.auth_middleware import authenticate
 from services.logger import logger
 
 endpoints = Blueprint('user_endpoints', __name__)
+
+@endpoints.route("/authorized")
+@authenticate
+def check_authorization():
+    return jsonify({"authorized": True}), 200
 
 @endpoints.route("/info")
 @authenticate
@@ -12,6 +20,17 @@ def get_user_endpoint():
     user = get_user(request.user['email'])
 
     return jsonify(user)
+
+@endpoints.route("/logout", methods=["GET"])
+@authenticate
+def logout_user():
+    # Clear cookies
+    frontend_url = os.getenv("FRONTEND_URL")
+    response = flask.make_response(jsonify({"message": "User logged out successfully"}))
+    response.set_cookie('access_token', '', expires=0)
+    response.set_cookie('session', '', expires=0)
+
+    return response
 
 @endpoints.route("/update", methods=["GET", "POST"])
 @authenticate
@@ -52,4 +71,18 @@ def get_user_accounts_endpoint():
 
     # Return the accounts
     return jsonify({"accounts": accounts})
+
+@endpoints.route("/transactions")
+@authenticate
+def get_user_transactions_endpoint():
+    """
+    Endpoint to get all transactions for the authenticated user.
+    """
+    user = request.user
+
+    # Get user transactions
+    transactions = get_user_transactions(user['id'])
+
+    # Return the transactions
+    return jsonify({"transactions": transactions})
 
