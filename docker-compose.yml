@@ -22,7 +22,7 @@ services:
     volumes:
       - ./app/frontend:/workdir/app/frontend # Sync frontend directory with container
       - /workdir/app/frontend/node_modules
-    command: /bin/sh -c "npm install && npm run dev"
+    command: /bin/sh -c "npm install --force && npm run dev"
     ports:
       - "3000:3000" # Maps port 3000 for frontend (if using React or similar)
     networks:
