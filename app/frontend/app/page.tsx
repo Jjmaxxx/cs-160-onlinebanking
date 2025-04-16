@@ -1,10 +1,6 @@
-import Navbar from './components/Navbar';
+import { DashboardPage } from "./components/dashboard-page"
 
-export default function Intro() {
-  return (
-    <div>
-        <Navbar />
-        HIII
-    </div>
-  );
+export default function Home() {
+  return <DashboardPage />
 }
+

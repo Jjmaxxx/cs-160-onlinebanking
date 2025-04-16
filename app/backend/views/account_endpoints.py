@@ -1,5 +1,10 @@
 from flask import Blueprint, jsonify, request
 from daos.user_info import user_id_by_email
+from PIL import Image
+import io
+import pytesseract
+import re
+
 from daos.account import (
     get_account,
     open_account,
@@ -82,6 +87,25 @@ def withdraw_endpoint():
         return jsonify({"error": str(e)}), 400
 
     return jsonify({"message": "Withdrawal successful"})
+
+
+def extract_check_amount(text):
+    match = re.search(r'\$\s?\d{1,3}(?:,\d{3})*(?:\.\d{2})?', text)
+    return match.group(0) if match else "Not found"
+
+
+@endpoints.route("/deposit_check")
+@authenticate
+@account_authorization
+def deposit_check():
+    file = request.files['check_image']
+    if not file:
+        return "No file uploaded", 400
+    image = Image.open(io.BytesIO(file.read()))
+    text = pytesseract.image_to_string(image)
+    print(text)
+    amount = extract_check_amount(text)
+    print(amount)
 
 @endpoints.route("/transfer") # Have not tested this endpoint yet
 @authenticate

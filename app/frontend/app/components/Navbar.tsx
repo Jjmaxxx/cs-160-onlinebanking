@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, user } = useAuth()
   const handleGoogleLogin = async () => {
     try {
       window.location.href = "http://localhost:12094/auth/google/login";
@@ -14,15 +15,13 @@ function Navbar() {
 
   const handleLogout = async () => {
     try {
-      fetch("http://localhost:12094/user/logout", {
+    fetch("http://localhost:12094/auth/logout", {
       method: "GET",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
     })
       .then((response) => response.json())
       .then((data) => {
-        setIsLoggedIn(false);
-
         // Redirect to homepage
         window.location.href = "/";
       })
@@ -46,32 +45,6 @@ function Navbar() {
   //     })
   //     .catch((error) => console.error("Fetch error:", error));
   // }, []);
-  useEffect(() => {
-    fetch("http://localhost:12094/user/authorized", {
-      method: "GET",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Unauthorized");
-      }
-    })
-      .then((data) => {
-        if (data.authorized) {
-          console.log("User is authorized");
-          setIsLoggedIn(true);
-        } else {
-          console.warn("User not authorized", data.error);
-        }
-    })
-      .catch((err) => {
-      console.error("Auth check failed:", err.message);
-      setIsLoggedIn(false);
-    });
-  }, []);
 
 
      return (<nav className="w-full bg-gray-900 text-white p-4 flex justify-between items-center shadow-md">

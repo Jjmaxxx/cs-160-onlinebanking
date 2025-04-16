@@ -21,4 +21,4 @@ COPY /app /workdir/app
 WORKDIR /workdir/app/frontend
 
 # Install frontend dependencies
-RUN npm install
+RUN npm install --force

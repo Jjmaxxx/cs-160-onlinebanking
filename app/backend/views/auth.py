@@ -1,5 +1,6 @@
-from flask import Blueprint
-from services.auth import google_authorize_service, google_callback_service
+from flask import Blueprint, jsonify, request
+from services.auth import google_authorize_service, google_callback_service, logout_user
+from middlewares.auth_middleware import authenticate
 
 auth = Blueprint('auth', __name__)
 
@@ -13,5 +14,11 @@ def callback():
 
 
 @auth.route('/logout')
+@authenticate
 def logout():
-    return "This is the flagged comments page"
+    return logout_user()
+
+@auth.route('/authorized')
+@authenticate
+def check_authorization():
+    return jsonify({"authorized": True, "user": request.user}), 200
