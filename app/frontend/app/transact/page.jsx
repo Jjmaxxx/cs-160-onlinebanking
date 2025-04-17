@@ -59,36 +59,49 @@ export default function MoneyManager() {
     if (isNaN(numAmount) || numAmount <= 0) return;
 
     var result = null;
-    if (type === "withdraw") {
-      result = withdraw(selectedAccount.id, numAmount)
-    } else if (type === "deposit") {
-      result = deposit(selectedAccount.id, numAmount)
-    } else if (type === "cheque") {
-      // Cash Cheque logic
-    } else if (type === "transfer") {
-      if (transferEmail && transferEmail.trim() !== "") {
-        result = transferToEmail(
-          selectedAccount.id,
-          transferEmail,
-          numAmount
-        );
-      } else if (transferAccount) {
-        result = transferToSelf(
-          selectedAccount.id,
-          transferAccount.id,
-          numAmount
-        );
-      } else {
+    switch (type) {
+      case "withdraw":
+        result = withdraw(selectedAccount.id, numAmount);
+        break;
+      case "deposit":
+        result = deposit(selectedAccount.id, numAmount);
+        break;
+      case "cheque":
+        // TODO: Cash Cheque logic
+        break;
+      case "transfer":
+        if (transferEmail && transferEmail.trim() !== "") {
+          result = transferToEmail(
+            selectedAccount.id,
+            transferEmail,
+            numAmount
+          );
+        } else if (transferAccount) {
+          result = transferToSelf(
+            selectedAccount.id,
+            transferAccount.id,
+            numAmount
+          );
+        }
+        break;
+      default:
         result = new Promise((resolve, reject) => {
           reject(new Error("Please provide either an email or select an account to transfer to."));
-        })
-      }
+        });
+        break;
     }
 
     displayTransactionResult(result);
-    setTrigger(trigger + 1);
+    // setTrigger(trigger + 1);
     setAmount("");
     setPopupType(null);
+
+    // Need to wait for the backend to finish before triggering frontend to refresh
+    if (result) {
+      result.then((_) =>{
+        setTrigger(trigger + 1);
+      });
+    }
   };
 
   return (

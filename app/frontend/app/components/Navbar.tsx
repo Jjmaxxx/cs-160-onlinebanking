@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
-  const { isLoggedIn, user } = useAuth()
+  const { isLoggedIn, _ } = useAuth()
   const handleGoogleLogin = async () => {
     try {
       window.location.href = "http://localhost:12094/auth/google/login";
@@ -21,7 +21,7 @@ function Navbar() {
       headers: { "Content-Type": "application/json" },
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then((_) => {
         // Redirect to homepage
         window.location.href = "/";
       })
