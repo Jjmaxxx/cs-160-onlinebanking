@@ -57,6 +57,7 @@ export default function MoneyManager() {
     let result = null;
     if (!selectedAccount) return;
     const numAmount = parseFloat(amount);
+
     if (type === "withdraw") {
       if (isNaN(numAmount) || numAmount <= 0) return;
       result = withdraw(selectedAccount.id, numAmount)
@@ -84,7 +85,7 @@ export default function MoneyManager() {
           numAmount
         );
       }
-    
+     }
     displayTransactionResult(result);
     // setTrigger(trigger + 1);
     setAmount("");
