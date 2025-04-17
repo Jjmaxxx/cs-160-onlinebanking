@@ -57,8 +57,6 @@ export default function MoneyManager() {
     let result = null;
     if (!selectedAccount) return;
     const numAmount = parseFloat(amount);
-    
-    
     if (type === "withdraw") {
       if (isNaN(numAmount) || numAmount <= 0) return;
       result = withdraw(selectedAccount.id, numAmount)
@@ -85,17 +83,19 @@ export default function MoneyManager() {
           transferAccount.id,
           numAmount
         );
-      } else {
-        result = new Promise((resolve, reject) => {
-          reject(new Error("Please provide either an email or select an account to transfer to."));
-        })
       }
-    }
     
     displayTransactionResult(result);
-    setTrigger(trigger + 1);
+    // setTrigger(trigger + 1);
     setAmount("");
     setPopupType(null);
+
+    // Need to wait for the backend to finish before triggering frontend to refresh
+    if (result) {
+      result.then((_) =>{
+        setTrigger(trigger + 1);
+      });
+    }
   };
   const handleFileChange = (e) => {
     if (e.target.files.length > 0) {
