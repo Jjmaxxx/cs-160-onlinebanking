@@ -1,14 +1,15 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import { deposit, withdraw, transferToEmail, transferToSelf } from "../utils/api";
+import { deposit, withdraw, transferToEmail, transferToSelf, deposit_check } from "../utils/api";
 import { AccountDropdown } from "./account_dropdown.jsx";
 
 export default function MoneyManager() {
   const [accounts, setAccounts] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [amount, setAmount] = useState("");
+  const [file, setFile] = useState(null);
+  const [uploadCheckText, setUploadCheckText] = useState("Upload Check");
 
   const [transferEmail, setTransferEmail] = useState("");
   const [transferAccount, setTransferAccount] = useState(null);
@@ -48,49 +49,42 @@ export default function MoneyManager() {
     })
     .catch((error) => {
       // Handle error
-      console.error(`${type} error:`, error);
-      alert(`${type.charAt(0).toUpperCase() + type.slice(1)} failed`);
+      console.error(`$error:`, error);
     });
   }
 
   const handleTransaction = (type) => {
+    let result = null;
     if (!selectedAccount) return;
     const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) return;
-
-    var result = null;
-    switch (type) {
-      case "withdraw":
-        result = withdraw(selectedAccount.id, numAmount);
-        break;
-      case "deposit":
-        result = deposit(selectedAccount.id, numAmount);
-        break;
-      case "cheque":
-        // TODO: Cash Cheque logic
-        break;
-      case "transfer":
-        if (transferEmail && transferEmail.trim() !== "") {
-          result = transferToEmail(
-            selectedAccount.id,
-            transferEmail,
-            numAmount
-          );
-        } else if (transferAccount) {
-          result = transferToSelf(
-            selectedAccount.id,
-            transferAccount.id,
-            numAmount
-          );
-        }
-        break;
-      default:
-        result = new Promise((resolve, reject) => {
-          reject(new Error("Please provide either an email or select an account to transfer to."));
-        });
-        break;
+    if (type === "withdraw") {
+      if (isNaN(numAmount) || numAmount <= 0) return;
+      result = withdraw(selectedAccount.id, numAmount)
+    } else if (type === "deposit") {
+      if (isNaN(numAmount) || numAmount <= 0) return;
+      result = deposit(selectedAccount.id, numAmount)
+    }else if(type === "check"){
+      setUploadCheckText("Upload Check");
+      const formData = new FormData();
+      formData.append('check_image', file);
+      result = deposit_check(selectedAccount.id, formData);
     }
-
+     else if (type === "transfer") {
+      if (isNaN(numAmount) || numAmount <= 0) return;
+      if (transferEmail && transferEmail.trim() !== "") {
+        result = transferToEmail(
+          selectedAccount.id,
+          transferEmail,
+          numAmount
+        );
+      } else if (transferAccount) {
+        result = transferToSelf(
+          selectedAccount.id,
+          transferAccount.id,
+          numAmount
+        );
+      }
+    
     displayTransactionResult(result);
     // setTrigger(trigger + 1);
     setAmount("");
@@ -101,6 +95,12 @@ export default function MoneyManager() {
       result.then((_) =>{
         setTrigger(trigger + 1);
       });
+    }
+  };
+  const handleFileChange = (e) => {
+    if (e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+      setUploadCheckText(e.target.files[0].name);
     }
   };
 
@@ -134,7 +134,7 @@ export default function MoneyManager() {
                   Deposit
                 </button>
                 <button
-                  onClick={() => setPopupType("cheque")}
+                  onClick={() => setPopupType("check")}
                   className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
                 >
                   Cash Cheque
@@ -168,6 +168,19 @@ export default function MoneyManager() {
                   onChange={(e) => setAmount(e.target.value)}
                   className="mb-4 w-full px-4 py-2 border rounded"
                 />
+              )}
+              {(popupType === "check") && (
+                <div className="relative">
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleFileChange}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
+                  />
+                  <div className="w-full h-full flex flex-col items-center justify-center border rounded cursor-pointer bg-gray-200 hover:bg-gray-300">
+                    <span className="text-gray-600">{uploadCheckText}</span>
+                  </div>
+                </div>
               )}
               {popupType === "transfer" && (
                 <>

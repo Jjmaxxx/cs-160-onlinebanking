@@ -1,9 +1,7 @@
 from flask import Blueprint, jsonify, request
 from daos.user_info import user_id_by_email
-from PIL import Image
-import io
-import pytesseract
-import re
+
+
 
 from daos.account import (
     get_account,
@@ -12,9 +10,13 @@ from daos.account import (
     deposit_to_account,
     withdraw_from_account,
     transfer_funds,
-    user_checking_account
+    user_checking_account,
+)
+from services.account import (
+    read_check
 )
 from middlewares.auth_middleware import authenticate, account_authorization
+
 
 endpoints = Blueprint('account_endpoints', __name__)
 
@@ -89,23 +91,18 @@ def withdraw_endpoint():
     return jsonify({"message": "Withdrawal successful"})
 
 
-def extract_check_amount(text):
-    match = re.search(r'\$\s?\d{1,3}(?:,\d{3})*(?:\.\d{2})?', text)
-    return match.group(0) if match else "Not found"
-
-
-@endpoints.route("/deposit_check")
+@endpoints.route("/deposit_check", methods=["POST"])
 @authenticate
 @account_authorization
 def deposit_check():
-    file = request.files['check_image']
-    if not file:
+    account_id = request.args.get('account_id')
+    check_image = request.files['check_image']
+    if not check_image:
         return "No file uploaded", 400
-    image = Image.open(io.BytesIO(file.read()))
-    text = pytesseract.image_to_string(image)
-    print(text)
-    amount = extract_check_amount(text)
-    print(amount)
+    amount = read_check(int(account_id),check_image)
+    if amount:
+        return jsonify({"message": f'{amount} has been deposited'}), 200
+    return jsonify({"error": f'File not detected to be a check with money.'}), 500
 
 @endpoints.route("/transfer") # Have not tested this endpoint yet
 @authenticate

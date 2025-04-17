@@ -19,12 +19,6 @@ app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
 app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
-@app.route("/example_protected_route")
-@authenticate
-def protected_route():
-    print(request.user)
-    return jsonify({"message": f"Hi logged in user, {request.user['email']}!"})
-
 @app.before_request
 def before_request():
     get_db_connection()
