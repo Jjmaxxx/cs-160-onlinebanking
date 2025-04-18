@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from daos.user_info import user_id_by_email
+from services.logger import logger
 
 
 
@@ -11,6 +12,8 @@ from daos.account import (
     withdraw_from_account,
     transfer_funds,
     user_checking_account,
+    add_bill_payment,
+    get_bill_payments,
 )
 from services.account import (
     read_check
@@ -137,3 +140,38 @@ def transfer_endpoint():
         return jsonify({"error": str(e)}), 400
 
     return jsonify({"message": "Transfer successful"})
+
+@endpoints.route("/register_bill_payment")
+@authenticate
+@account_authorization
+def bill_endpoint():
+    """
+    Endpoint to register a bill payment.
+    """
+    account_id = request.args.get('account_id')
+    bill_name = request.args.get('bill_name')
+    amount = request.args.get('amount', type=float)
+    due_date = int(request.args.get('due_date'))
+    logger().debug("HERRRRRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEE")
+
+    try:
+        add_bill_payment(int(account_id), bill_name, amount, due_date)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+    return jsonify({"message": "Bill payment registered successfully"})
+
+@endpoints.route("/get_bill_payments")
+@authenticate
+@account_authorization
+def get_bill_payments_endpoint():
+    """
+    Endpoint to retrieve bill payments for an account.
+    """
+    account_id = request.args.get('account_id')
+    payments = get_bill_payments(int(account_id))
+
+    if not payments:
+        return jsonify({"error": "No bill payments found for this account"}), 400
+
+    return jsonify(payments)

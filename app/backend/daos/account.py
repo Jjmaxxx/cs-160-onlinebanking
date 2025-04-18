@@ -38,6 +38,17 @@ CREATE TABLE IF NOT EXISTS transactions(
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
     FOREIGN KEY (destination_account_id) REFERENCES accounts(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS bill_payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    payee_name VARCHAR(255) NOT NULL,
+    payee_account_id INT,
+    amount DECIMAL(15, 2) NOT NULL CHECK (amount >= 0),
+    bill_status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (payee_account_id) REFERENCES accounts(id) ON DELETE SET NULL
+);
+
 """
 
 def get_account(id_):
@@ -233,3 +244,45 @@ def get_user_transactions(user_id: int):
         logger().debug("No transactions found for user_id: %s", user_id)
     
     return transactions
+# add_bill_payment(int(account_id), bill_name, amount, due_date)
+
+def add_bill_payment(account_id: int, bill_name: str, amount: float, due_date: int):
+    """
+    Register a bill payment for an account. (due_date is unix timestamp)
+    """
+
+    query = '''
+        INSERT INTO bill_payments (payee_name, payee_account_id, amount, payment_date)
+        VALUES (%s, %s, %s, FROM_UNIXTIME(%s));
+    '''
+    
+    logger().debug(
+        "Adding bill payment for account_id: %s, bill_name: %s, amount: %s, due_date: %s",
+        account_id, bill_name, amount, due_date
+    )
+    
+    # Execute the query
+    result = execute_query(query, (bill_name, account_id, amount, due_date))
+    
+    if result:
+        logger().debug("Bill payment added successfully for account_id: %s", account_id)
+    
+    return result
+
+def get_bill_payments(account_id: int):
+    """
+    Retrieve bill payments for an account.
+    """
+    query = '''
+        SELECT * FROM bill_payments
+        WHERE payee_account_id = %s;
+    '''
+    
+    logger().debug("Fetching bill payments for account_id: %s", account_id)
+    
+    payments = fetch_all(query, (account_id,))
+    
+    if not payments:
+        logger().debug("No bill payments found for account_id: %s", account_id)
+    
+    return payments
