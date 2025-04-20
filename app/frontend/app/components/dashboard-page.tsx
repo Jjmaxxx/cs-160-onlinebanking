@@ -35,7 +35,7 @@ export function DashboardPage() {
       </div>
     </div>
     ) : (
-      <div>Please login first to view!</div>
+      <div>Please login first to view.</div>
     )}
     </div>
   )

@@ -58,7 +58,7 @@ function Navbar() {
           {isLoggedIn &&
             <>
               <a href="/transact" className="hover:text-gray-400">Transact</a>
-              <a href="#" onClick={handleLogout} className="hover:text-gray-400">Logout</a>
+              <a href="#" onClick={handleLogout} className="hover:text-gray-400">Logout.</a>
             </>
           }
 
