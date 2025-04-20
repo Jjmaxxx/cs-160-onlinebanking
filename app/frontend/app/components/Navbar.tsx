@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
-  const { isLoggedIn, _ } = useAuth()
+  const { isLoggedIn } = useAuth()
   const handleGoogleLogin = async () => {
     try {
       window.location.href = "http://localhost:12094/auth/google/login";
@@ -52,13 +52,13 @@ function Navbar() {
         <div className="space-x-4">
           <a href="/" className="hover:text-gray-400">Home</a>
           <a href="/maps" className="hover:text-gray-400">Find ATMs</a>
-          <a href="#" className="hover:text-gray-400">Contact</a>
-
+          <a href="#" className="hover:text-gray-400">Contact</a> 
           {/* For when user is logged in, sho more in navbar */}
           {isLoggedIn &&
             <>
+              <a href="/user-form" className="hover:text-gray-400">Profile Information</a>
               <a href="/transact" className="hover:text-gray-400">Transact</a>
-              <a href="#" onClick={handleLogout} className="hover:text-gray-400">Logout.</a>
+              <a href="#" onClick={handleLogout} className="hover:text-gray-400">Logout</a>
             </>
           }
 

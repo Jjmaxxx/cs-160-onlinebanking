@@ -17,7 +17,7 @@ export function AccountDropdown({
     </option>
       {accounts.map((account) => (
         <option key={account.id} value={account.id}>
-          {account.account_type} - ${account.balance}
+          {String(account.account_type).toUpperCase()} (...{String(account.account_number).slice(-4)}) - ${account.balance}
         </option>
       ))}
     </select>
