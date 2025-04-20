@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS accounts(
     user_id INT,
     account_type ENUM('savings', 'checking') DEFAULT 'checking',
     balance DECIMAL(15, 2) DEFAULT 0.00,
+    interest_rate DECIMAL(5, 2),
     account_status ENUM('active', 'suspended', 'closed') DEFAULT 'active',
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -79,6 +80,17 @@ BEGIN
     SET max_value = (POWER(10, num_digits) - 1);
     SET random_number = FLOOR(min_value + (RAND() * (max_value - min_value + 1)));
     SET NEW.account_number = random_number;
+END$$
+
+CREATE TRIGGER set_interest_rate
+BEFORE INSERT ON accounts
+FOR EACH ROW
+BEGIN
+    IF NEW.account_type = 'checking' THEN
+        SET NEW.interest_rate = 0.01;
+    ELSEIF NEW.account_type = 'savings' THEN
+        SET NEW.interest_rate = 1.25;
+    END IF;
 END$$
 
 DELIMITER ;

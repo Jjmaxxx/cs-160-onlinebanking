@@ -32,16 +32,15 @@ def account_info():
     
     return jsonify(account) if account else jsonify({"error": "Account not found"}), 400
 
-@endpoints.route("/open_account")
+@endpoints.route("/open_account", methods = ["POST"])
 @authenticate
 def open_account_endpoint():
+    data = request.get_json()
     user_id = request.user['id']
-
     open_account(
         user_id=user_id, 
-        account_type=request.args.get('account_type', 'checking')
+        account_type= data.get('account_type', 'checking')
     )
-
     return jsonify({"message": "Account opened successfully"})
 
 @endpoints.route("/close_account")

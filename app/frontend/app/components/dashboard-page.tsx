@@ -25,11 +25,12 @@ export function DashboardPage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <AccountOverview />
             <QuickActions />
-            <UpcomingBills />
+            
           </div>
           <div className="grid gap-6 md:grid-cols-2">
+            <UpcomingBills />
             <RecentTransactions />
-            <FinancialInsights />
+            {/* <FinancialInsights /> */}
           </div>
         </main>
       </div>
