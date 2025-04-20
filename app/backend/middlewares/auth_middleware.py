@@ -3,6 +3,7 @@ from functools import wraps
 import requests
 from daos.auth import get_user
 from daos.account import check_user_owns_account
+from daos.bank_manager import get_bank_manager
 from services.logger import logger
 import sys
 
@@ -68,3 +69,22 @@ def account_authorization(func):
         
         return func(*args, **kwargs)
     return wrapper
+
+def bank_manager_authorization(f1):
+    @wraps(f1)
+    def wrapper1(*args, **kwargs):
+        logger().debug("Checking bank manager authorization for request")
+        user = request.user
+        if not user:
+            logger().debug("User not found in request")
+            return jsonify({"error": "User not found"}), 401
+
+        bank_manager = get_bank_manager(user['id'])
+        if not bank_manager:
+            logger().debug("User is not a bank manager: %s", user['id'])
+            return jsonify({"error": "User is not a bank manager"}), 403
+
+        request.bank_manager = bank_manager
+        logger().debug("Authenticated bank manager: %s", request.bank_manager)
+        return f1(*args, **kwargs)
+    return wrapper1
