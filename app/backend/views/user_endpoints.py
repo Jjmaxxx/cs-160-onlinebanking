@@ -16,9 +16,10 @@ def get_user_endpoint():
 
     return jsonify(user)
 
-@endpoints.route("/update", methods=["GET", "POST"])
+@endpoints.route("/update", methods=["POST"])
 @authenticate
 def update_user_endpoint():
+    print("hi")
     # In a real application, you would update the user info in the database here
     user = request.user
     # For demonstration, let's just return the same user info
