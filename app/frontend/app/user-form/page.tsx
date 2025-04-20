@@ -9,7 +9,7 @@ export default function UserInformationPage() {
         <div className="max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold mb-6">Personal Information</h1>
           <p className="text-muted-foreground mb-8">
-            Please provide your personal information to continue with your application.
+            Please provide your personal information before opening an account.
           </p>
           <UserInformationForm />
         </div>
