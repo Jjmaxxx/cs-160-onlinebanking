@@ -65,9 +65,12 @@ def get_user_transactions_endpoint():
     """
     user = request.user
 
+    print(user)
     # Get user transactions
-    transactions = get_user_transactions(user['id'])
+    try:
+        transactions = get_user_transactions(user['id'])
+        return jsonify({"transactions": transactions})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
-    # Return the transactions
-    return jsonify({"transactions": transactions})
 

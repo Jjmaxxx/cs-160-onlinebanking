@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS reports(
 );
 CREATE TABLE IF NOT EXISTS accounts(
 	id INT AUTO_INCREMENT PRIMARY KEY,
+    account_number BIGINT UNSIGNED UNIQUE,
     user_id INT,
     account_type ENUM('savings', 'checking') DEFAULT 'checking',
     balance DECIMAL(15, 2) DEFAULT 0.00,
@@ -61,3 +62,23 @@ CREATE TABLE IF NOT EXISTS bill_payments (
     FOREIGN KEY (payee_account_id) REFERENCES accounts(id) ON DELETE SET NULL
 );
 
+
+
+DELIMITER $$
+
+CREATE TRIGGER assign_account_number
+BEFORE INSERT ON accounts
+FOR EACH ROW
+BEGIN
+    DECLARE num_digits INT;
+    DECLARE min_value BIGINT;
+    DECLARE max_value BIGINT;
+    DECLARE random_number BIGINT;
+    SET num_digits = FLOOR(8 + (RAND() * 5)); -- 8, 9, 10, 11, 12
+    SET min_value = POWER(10, num_digits - 1);
+    SET max_value = (POWER(10, num_digits) - 1);
+    SET random_number = FLOOR(min_value + (RAND() * (max_value - min_value + 1)));
+    SET NEW.account_number = random_number;
+END$$
+
+DELIMITER ;
