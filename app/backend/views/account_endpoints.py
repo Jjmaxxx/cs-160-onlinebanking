@@ -14,6 +14,7 @@ from daos.account import (
     user_checking_account,
     add_bill_payment,
     get_bill_payments,
+    get_all_bill_payments
 )
 from services.account import (
     read_check
@@ -172,5 +173,20 @@ def get_bill_payments_endpoint():
 
     if not payments:
         return jsonify({"error": "No bill payments found for this account"}), 400
+
+    return jsonify(payments)
+
+
+@endpoints.route("/get_all_bill_payments")
+@authenticate
+def get_all_bill_payments_endpoint():
+    """
+    Endpoint to retrieve all bill payments for a user.
+    """
+    user_id = request.user["id"]
+    payments = get_all_bill_payments(int(user_id))
+    print(payments)
+    if not payments:
+        return jsonify({"error": "No bill payments found for this user"}), 400
 
     return jsonify(payments)

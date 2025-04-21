@@ -9,6 +9,7 @@ import { QuickActions } from "./quick-actions"
 import { FinancialInsights } from "./financial-insights"
 import { UpcomingBills } from "./upcoming-bills"
 import Navbar from '../components/Navbar';
+import { ScheduledBills } from "./scheduled-bills";
 import { useAuth } from '../context/AuthContext';
 
 export function DashboardPage() {
@@ -28,7 +29,7 @@ export function DashboardPage() {
             
           </div>
           <div className="grid gap-6 md:grid-cols-2">
-            <UpcomingBills />
+            <ScheduledBills />
             <RecentTransactions />
             {/* <FinancialInsights /> */}
           </div>

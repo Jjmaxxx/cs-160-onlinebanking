@@ -52,7 +52,6 @@ function Navbar() {
         <div className="space-x-4">
           <a href="/" className="hover:text-gray-400">Home</a>
           <a href="/maps" className="hover:text-gray-400">Find ATMs</a>
-          <a href="#" className="hover:text-gray-400">Contact</a> 
           {/* For when user is logged in, sho more in navbar */}
           {isLoggedIn &&
             <>
