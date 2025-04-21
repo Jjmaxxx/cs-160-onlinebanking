@@ -1,11 +1,23 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronDown, ChevronUp, Eye, EyeOff } from "lucide-react"
+import { ChevronDown, ChevronUp, Eye, EyeOff, Plus } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
 
 type Account = {
   id: number
@@ -28,8 +40,11 @@ export function AccountOverview() {
     checking: false,
     savings: false,
   })
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [accountType, setAccountType] = useState("checking")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(() => {
+  const fetchAccounts = () => {
     setLoading(true)
     fetch("http://localhost:12094/user/accounts", {
       method: "GET",
@@ -52,6 +67,10 @@ export function AccountOverview() {
         setError("Unable to load your accounts. Please try again later.")
         setLoading(false)
       })
+  }
+
+  useEffect(() => {
+    fetchAccounts()
   }, [])
 
   // Group accounts by type
@@ -72,12 +91,14 @@ export function AccountOverview() {
       currency: "USD",
     }).format(amount)
   }
+
   const toggleAccountNumberVisibility = (accountId: number) => {
     setRevealedAccounts((prev) => ({
       ...prev,
       [accountId]: !prev[accountId],
     }))
   }
+
   const toggleExpandSection = (section: string) => {
     setExpandedSections((prev) => ({
       ...prev,
@@ -85,7 +106,40 @@ export function AccountOverview() {
     }))
   }
 
-   const renderAccountsList = (accounts: Account[], borderColor: string, accountType: string) => {
+  const handleOpenAccount = async () => {
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch("http://localhost:12094/accounts/open_account", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          account_type: accountType,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to open account")
+      }
+
+      const data = await response.json()
+
+      setIsDialogOpen(false)
+      fetchAccounts()
+
+      toast(`Your new ${accountType} account has been successfully opened.`)
+    } catch (error) {
+      console.error("Error opening account:", error)
+      toast(`Failed to open account. Please try again later.`)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const renderAccountsList = (accounts: Account[], borderColor: string, accountType: string) => {
     if (accounts.length === 0) {
       return <div className="py-4 text-center text-muted-foreground">No accounts found</div>
     }
@@ -157,10 +211,58 @@ export function AccountOverview() {
           <CardTitle>Account Overview</CardTitle>
           <CardDescription>View your account balances</CardDescription>
         </div>
-        <Button variant="ghost" size="icon" onClick={() => setShowBalance(!showBalance)}>
-          {showBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          <span className="sr-only">{showBalance ? "Hide" : "Show"} balance</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => setShowBalance(!showBalance)}>
+            {showBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            <span className="sr-only">{showBalance ? "Hide" : "Show"} balance</span>
+          </Button>
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="flex items-center gap-1">
+                <Plus className="h-4 w-4" /> Open Account
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Open New Account</DialogTitle>
+                <DialogDescription>Choose the type of account you would like to open.</DialogDescription>
+              </DialogHeader>
+
+              <div className="py-4">
+              <RadioGroup value={accountType} onValueChange={setAccountType} className="grid grid-cols-2 gap-4">
+                {["checking", "savings"].map((type) => (
+                  <Label
+                    key={type}
+                    htmlFor={type}
+                    className={cn(
+                      "flex flex-col border-2 rounded-lg p-4 cursor-pointer transition-all",
+                      accountType === type
+                        ? "border-emerald-600 bg-emerald-50"
+                        : "border-muted"
+                    )}
+                  >
+                    <RadioGroupItem value={type} id={type} className="hidden" />
+                    <span className="font-medium capitalize">{type}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {type === "checking" ? "For everyday transactions" : "Earn interest on your money"}
+                    </span>
+                  </Label>
+                ))}
+              </RadioGroup>
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting}>
+                  Cancel
+                </Button>
+                <Button onClick={handleOpenAccount} disabled={isSubmitting}>
+                  {isSubmitting ? "Opening..." : "Open Account"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </CardHeader>
       <CardContent>
         {loading ? (

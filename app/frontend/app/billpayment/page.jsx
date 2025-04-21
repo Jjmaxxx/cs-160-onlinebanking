@@ -49,13 +49,7 @@ export default function BillManager() {
   }, [selectedAccount, trigger]);
 
   const handleAddBill = () => {
-    console.log("selectedAccount", selectedAccount);
-    console.log("billName", billName);
-    console.log("billAmount", billAmount);
-    console.log("billDueDate", billDueDate);
-
     if (!selectedAccount || !billName || !billAmount || !billDueDate) return;
-    console.log("HERE");
 
     const dueTimestamp = Math.floor(new Date(billDueDate).getTime() / 1000);
 

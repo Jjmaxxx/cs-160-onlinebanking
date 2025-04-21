@@ -230,10 +230,10 @@ def get_user_transactions(user_id: int):
     Retrieve all transactions for a user.
     """
     query = '''
-        SELECT * FROM transactions
-        WHERE account_id IN (
-            SELECT id FROM accounts WHERE user_id = %s
-        );
+        SELECT t.*, a.account_number
+        FROM transactions t
+        INNER JOIN accounts a ON t.account_id = a.id
+        WHERE a.user_id = %s;
     '''
     
     logger().debug("Fetching transactions for user_id: %s", user_id)
@@ -284,5 +284,25 @@ def get_bill_payments(account_id: int):
     
     if not payments:
         logger().debug("No bill payments found for account_id: %s", account_id)
+    
+    return payments
+
+
+def get_all_bill_payments(user_id: int):
+    """
+    Retrieve all bill payments from a user.
+    """
+    query = '''
+        SELECT bp.*, a.account_number FROM bill_payments bp
+        LEFT JOIN accounts a ON bp.payee_account_id = a.id 
+        WHERE a.user_id = %s;
+    '''
+    print(query)
+    logger().debug("Fetching bill payments for user_id: %s", user_id)
+    
+    payments = fetch_all(query, (user_id,))
+    print(payments)
+    if not payments:
+        logger().debug("No bill payments found for user_id: %s", user_id)
     
     return payments
