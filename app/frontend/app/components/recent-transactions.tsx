@@ -5,7 +5,6 @@ import { Avatar } from "@/components/ui/avatar"
 import { useState, useEffect } from "react";
 import { ArrowDownLeft, ArrowUpRight, ChevronDown, ChevronUp, ChevronRight } from "lucide-react"
 import { format } from "date-fns";
-import Link from "next/link"
 
 
 export function RecentTransactions() {
@@ -43,7 +42,7 @@ export function RecentTransactions() {
   }
 
   useEffect(() => {
-    fetch("http://localhost:12094/user/transactions", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/transactions`, {
       method: "GET",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -53,7 +52,9 @@ export function RecentTransactions() {
         // console.log(mapTransactions(data.transactions).slice(-6));
         //console.log(transactions);
         // NOTE: SLICE REMOVES ALL BUT 6 IN ARRAY
-        setTransactions(mapTransactions(data.transactions.slice(-8).reverse()));
+        if(data){
+          setTransactions(mapTransactions(data.transactions.slice(-8).reverse()));
+        }
       })
       .catch((error) => console.error("Fetch error:", error));
   }, []);

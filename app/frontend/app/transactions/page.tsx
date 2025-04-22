@@ -44,7 +44,7 @@ export default function AllTransactionsPage() {
 
   useEffect(() => {
     setIsLoading(true)
-    fetch("http://localhost:12094/user/transactions", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/transactions`, {
       method: "GET",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

@@ -3,7 +3,7 @@
 import { Check, ChevronDown } from "lucide-react"
 import { useState } from "react"
 
-export function AccountDropdown({ accounts, selectedAccount, onChange }) {
+export default function AccountDropdown({ accounts, selectedAccount, onChange }) {
   const [isOpen, setIsOpen] = useState(false)
 
   const handleSelect = (account) => {

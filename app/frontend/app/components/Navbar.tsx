@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from "react";
 import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
   const { isLoggedIn } = useAuth()
   const handleGoogleLogin = async () => {
     try {
-      window.location.href = "http://localhost:12094/auth/google/login";
+      const port = window.location.port || 3000;
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google/login?port=${port}`;
     } catch (error) {
       console.error('Error during Google login request:', error);
     }
@@ -15,7 +15,7 @@ function Navbar() {
 
   const handleLogout = async () => {
     try {
-    fetch("http://localhost:12094/auth/logout", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
       method: "GET",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -30,22 +30,6 @@ function Navbar() {
       console.error('Failed to log out:', error);
     }
   }
-  
-  // useEffect(() => {
-  //   // Check if user is logged in
-  //   fetch("http://localhost:12094/user/info", {
-  //     method: "GET",
-  //     credentials: "include",
-  //     headers: { "Content-Type": "application/json" },
-  //   })
-  //     .then((response) => {
-  //       if (response.status === 401)
-  //       setIsLoggedIn(response.ok)
-  //       return response.json()
-  //     })
-  //     .catch((error) => console.error("Fetch error:", error));
-  // }, []);
-
 
      return (<nav className="w-full bg-gray-900 text-white p-4 flex justify-between items-center shadow-md">
         <h1 className="text-xl font-bold">BANK</h1>
@@ -56,7 +40,7 @@ function Navbar() {
           {isLoggedIn &&
             <>
               <a href="/user-form" className="hover:text-gray-400">Profile Information</a>
-              <a href="/transact" className="hover:text-gray-400">Transact</a>
+              {/* <a href="/transact" className="hover:text-gray-400">Transact</a> */}
               <a href="#" onClick={handleLogout} className="hover:text-gray-400">Logout</a>
             </>
           }

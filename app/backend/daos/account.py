@@ -69,6 +69,24 @@ def get_account(id_):
     
     return account
 
+def get_account_by_number(account_number):
+    """
+    Retrieve account information by account number.
+    """
+    query = '''
+        SELECT * FROM accounts
+        WHERE account_number = %s;
+    '''
+    
+    logger().debug("Fetching account for inumberd: %s", account_number)
+    
+    account = fetch_one(query, (account_number,))
+    
+    if not account:
+        logger().debug("No account found for id: %s", account_number)
+    
+    return account
+
 def user_checking_account(user_id: int):
     """
     Retrieve a checking account for a user.
@@ -297,11 +315,9 @@ def get_all_bill_payments(user_id: int):
         LEFT JOIN accounts a ON bp.payee_account_id = a.id 
         WHERE a.user_id = %s;
     '''
-    print(query)
     logger().debug("Fetching bill payments for user_id: %s", user_id)
     
     payments = fetch_all(query, (user_id,))
-    print(payments)
     if not payments:
         logger().debug("No bill payments found for user_id: %s", user_id)
     

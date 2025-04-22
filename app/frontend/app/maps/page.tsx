@@ -15,7 +15,7 @@ const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 async function findChaseAtms(position: Position): Promise<PlacesResponse> {
   const { lat, lng } = position;
-  const url = `http://localhost:12094/nearbysearch_proxy?location=${lat},${lng}&radius=1000&type=atm&keyword=chase`;
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/nearbysearch_proxy?location=${lat},${lng}&radius=1000&type=atm&keyword=chase`;
   
   const response = await fetch(url);
   const json = await response.json();
