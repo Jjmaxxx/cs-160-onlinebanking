@@ -14,7 +14,6 @@ import { Loader2 } from "lucide-react"
 import { useAuth } from '../context/AuthContext';
 
 
-// Form validation schema
 const formSchema = z.object({
   first_name: z.string().min(2, { message: "First name must be at least 2 characters." }),
   last_name: z.string().min(2, { message: "Last name must be at least 2 characters." }),
@@ -24,7 +23,6 @@ const formSchema = z.object({
   city: z.string().min(2, { message: "Please enter a valid city." }),
 })
 
-// US States for the dropdown
 const US_STATES = [
     "Alabama",
     "Alaska",
@@ -111,7 +109,6 @@ export function UserInformationForm() {
 
       toast("Your personal information has been successfully submitted.")
 
-      // Optionally reset the form after successful submission
     } catch (error) {
       console.error("Error submitting form:", error)
       toast("There was a problem submitting your information. Please try again.")

@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS accounts(
     account_type ENUM('savings', 'checking') DEFAULT 'checking',
     balance DECIMAL(15, 2) DEFAULT 0.00,
     interest_rate DECIMAL(5, 2),
-    account_status ENUM('active', 'suspended', 'closed') DEFAULT 'active',
+    account_status ENUM('active', 'closed') DEFAULT 'active',
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

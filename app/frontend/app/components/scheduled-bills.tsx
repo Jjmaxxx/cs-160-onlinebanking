@@ -48,7 +48,7 @@ export function ScheduledBills() {
                     <div className="flex flex-col text-sm text-gray-500">
                       <span>
                         On{" "}
-                        {new Date(bill.payment_date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                        {new Date(bill.payment_date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                       </span>
                       <span>From Account: •••• {bill.account_number.toString().slice(-4)}</span>
                     </div>

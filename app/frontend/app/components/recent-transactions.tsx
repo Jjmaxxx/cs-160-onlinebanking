@@ -10,7 +10,6 @@ import { format } from "date-fns";
 export function RecentTransactions() {
   const [transactions, setTransactions] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false)
-  // Current mapping for JSX
   type RawTransaction = {
     id: number;
     account_id: number;
@@ -22,7 +21,6 @@ export function RecentTransactions() {
     account_number: string;
   };
 
-  // Map DB to RawTransaction type
   function mapTransactions(rawTransactions: RawTransaction[]) {
     return rawTransactions.map((tx) => {
       const isDeposit = tx.transaction_type === "deposit";

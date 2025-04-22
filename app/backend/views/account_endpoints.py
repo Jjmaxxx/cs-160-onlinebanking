@@ -45,7 +45,7 @@ def open_account_endpoint():
     )
     return jsonify({"message": "Account opened successfully"})
 
-@endpoints.route("/close_account")
+@endpoints.route("/close_account", methods = ["POST"])
 @authenticate
 @account_authorization
 def close_account_endpoint():
@@ -53,12 +53,12 @@ def close_account_endpoint():
     Endpoint to close an account by ID.
     """
     account_id = request.args.get('account_id')
-    result = close_account(int(account_id))
-
-    if result:
-        return jsonify({"message": "Account closed successfully"})
-    else:
-        return jsonify({"error": "Failed to close account or account not found"}), 400
+    try:
+        close_account(int(account_id))    
+    except Exception as e:
+        return jsonify({"error": "Failed to close account"}), 400
+    return jsonify({"message": "Account closed successfully"})
+        
 
 @endpoints.route("/deposit")
 @authenticate
