@@ -56,7 +56,7 @@ function Navbar() {
           {isLoggedIn &&
             <>
               <a href="/user-form" className="hover:text-gray-400">Profile Information</a>
-              <a href="/transact" className="hover:text-gray-400">Transact</a>
+              {/* <a href="/transact" className="hover:text-gray-400">Transact</a> */}
               <a href="#" onClick={handleLogout} className="hover:text-gray-400">Logout</a>
             </>
           }

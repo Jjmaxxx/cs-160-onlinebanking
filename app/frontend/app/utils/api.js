@@ -16,14 +16,14 @@ export async function deposit(account_id, amount) {
     return data.message;
   }
 
-  export async function transferToEmail(from_account_id, to_email, amount) {
-    let data = await make_request(`http://localhost:12094/accounts/transfer?account_id=${from_account_id}&destination_email=${to_email}&amount=${amount}`, "GET");
+  export async function transferToAccount(from_account_id, to_account_num, amount) {
+    let data = await make_request(`http://localhost:12094/accounts/transfer?account_id=${from_account_id}&destination_account_number=${to_account_num}&amount=${amount}`, "GET");
 
     return data.message;
   }
 
   export async function transferToSelf(from_account_id, to_account_id, amount) {
-    let data = await make_request(`http://localhost:12094/accounts/transfer?account_id=${from_account_id}&destination_account_id=${to_account_id}&amount=${amount}`, "GET");
+    let data = await make_request(`http://localhost:12094/accounts/transfer?account_id=${from_account_id}&destination_account_number=${to_account_id}&amount=${amount}`, "GET");
 
     return data.message;
   }

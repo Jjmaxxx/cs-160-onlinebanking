@@ -118,7 +118,7 @@ export default function BillManager() {
   </div>
 
   <button
-    className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+    className="bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-white py-2 px-4 rounded"
     onClick={handleAddBill}
   >
     Add Bill

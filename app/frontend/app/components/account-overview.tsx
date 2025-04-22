@@ -19,21 +19,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 
-type Account = {
-  id: number
-  account_number: number
-  account_type: string
-  account_status: string
-  balance: string
-  created_at: string
-  user_id: number
-  interest_rate: number
-}
 
-export function AccountOverview() {
+
+export function AccountOverview( {accounts, fetchAccounts }) {
   const [showBalance, setShowBalance] = useState(true)
-  const [accounts, setAccounts] = useState<Account[]>([])
-  const [loading, setLoading] = useState(true)
+
   const [error, setError] = useState<string | null>(null)
   const [revealedAccounts, setRevealedAccounts] = useState<Record<string, boolean>>({})
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -43,31 +33,6 @@ export function AccountOverview() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [accountType, setAccountType] = useState("checking")
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const fetchAccounts = () => {
-    setLoading(true)
-    fetch("http://localhost:12094/user/accounts", {
-      method: "GET",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch accounts")
-        }
-        return response.json()
-      })
-      .then((data) => {
-        const accountsArray = Array.isArray(data) ? data : Object.values(data)
-        setAccounts(accountsArray[0])
-        setLoading(false)
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error)
-        setError("Unable to load your accounts. Please try again later.")
-        setLoading(false)
-      })
-  }
 
   useEffect(() => {
     fetchAccounts()
@@ -219,7 +184,7 @@ export function AccountOverview() {
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="flex items-center gap-1">
+              <Button size="sm" className="flex items-center gap-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                 <Plus className="h-4 w-4" /> Open Account
               </Button>
             </DialogTrigger>
@@ -256,7 +221,7 @@ export function AccountOverview() {
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting}>
                   Cancel
                 </Button>
-                <Button onClick={handleOpenAccount} disabled={isSubmitting}>
+                <Button onClick={handleOpenAccount} disabled={isSubmitting} className="bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                   {isSubmitting ? "Opening..." : "Open Account"}
                 </Button>
               </DialogFooter>
@@ -265,11 +230,6 @@ export function AccountOverview() {
         </div>
       </CardHeader>
       <CardContent>
-        {loading ? (
-          <div className="py-8 text-center text-muted-foreground">Loading your accounts...</div>
-        ) : error ? (
-          <div className="py-8 text-center text-red-500">{error}</div>
-        ) : (
           <Tabs defaultValue="checking">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="checking">Checking ({checkingAccounts.length})</TabsTrigger>
@@ -284,7 +244,6 @@ export function AccountOverview() {
               {renderAccountsList(savingsAccounts, "border-sky-500", "savings")}
             </TabsContent>
           </Tabs>
-        )}
       </CardContent>
     </Card>
   )

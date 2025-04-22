@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import { deposit, withdraw, transferToEmail, transferToSelf, deposit_check } from "../utils/api";
+import { deposit, withdraw, transferToAccount, transferToSelf, deposit_check } from "../utils/api";
 import { AccountDropdown } from "./account_dropdown.jsx";
 
 export default function MoneyManager() {
@@ -11,7 +11,7 @@ export default function MoneyManager() {
   const [file, setFile] = useState(null);
   const [uploadCheckText, setUploadCheckText] = useState("Upload Check");
 
-  const [transferEmail, setTransferEmail] = useState("");
+  const [transferAccountNum, setTransferAccountNum] = useState("");
   const [transferAccount, setTransferAccount] = useState(null);
 
   const [popupType, setPopupType] = useState(null);
@@ -72,10 +72,10 @@ export default function MoneyManager() {
     }
      else if (type === "transfer") {
       if (isNaN(numAmount) || numAmount <= 0) return;
-      if (transferEmail && transferEmail.trim() !== "") {
-        result = transferToEmail(
+      if (transferAccountNum && transferAccountNum.trim() !== "") {
+        result = transferToAccount(
           selectedAccount.id,
-          transferEmail,
+          Number(transferAccountNum),
           numAmount
         );
       } else if (transferAccount) {
@@ -187,10 +187,10 @@ export default function MoneyManager() {
                 <>
                   <input
                     type="email"
-                    placeholder="Enter recipient's email"
-                    value={transferEmail}
+                    placeholder="Enter recipient's account Number"
+                    value={transferAccountNum}
                     onChange={(e) => {
-                      setTransferEmail(e.target.value)
+                      setTransferAccountNum(e.target.value)
                       setTransferAccount("");
                     }}
                     className="mb-4 w-full px-4 py-2 border rounded"
@@ -205,7 +205,7 @@ export default function MoneyManager() {
                     selectedAccount={transferAccount}
                     onChange={(acc) => {
                       setTransferAccount(acc);
-                      setTransferEmail(""); // Clear email if account is selected
+                      setTransferAccountNum(""); // Clear email if account is selected
                     }}/>
                 </>
               )}

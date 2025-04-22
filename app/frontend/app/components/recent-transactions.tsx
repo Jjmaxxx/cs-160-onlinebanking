@@ -53,7 +53,9 @@ export function RecentTransactions() {
         // console.log(mapTransactions(data.transactions).slice(-6));
         //console.log(transactions);
         // NOTE: SLICE REMOVES ALL BUT 6 IN ARRAY
-        setTransactions(mapTransactions(data.transactions.slice(-8).reverse()));
+        if(data){
+          setTransactions(mapTransactions(data.transactions.slice(-8).reverse()));
+        }
       })
       .catch((error) => console.error("Fetch error:", error));
   }, []);

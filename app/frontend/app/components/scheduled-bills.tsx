@@ -15,7 +15,9 @@ export function ScheduledBills() {
       .then((res) => res.json())
       .then((data) => {
         console.log(data)
-        setBills(data.reverse())
+        if(!data.error){
+          setBills(data.reverse())
+        }
       })
   }, [])
 
