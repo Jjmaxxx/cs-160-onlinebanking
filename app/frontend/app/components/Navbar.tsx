@@ -22,7 +22,6 @@ function Navbar() {
     })
       .then((response) => response.json())
       .then((_) => {
-        // Redirect to homepage
         window.location.href = "/";
       })
       .catch((error) => console.error("Fetch error:", error));
@@ -35,10 +34,10 @@ function Navbar() {
         <h1 className="text-xl font-bold">BANK</h1>
         <div className="space-x-4">
           <a href="/" className="hover:text-gray-400">Home</a>
-          <a href="/maps" className="hover:text-gray-400">Find ATMs</a>
           {/* For when user is logged in, sho more in navbar */}
           {isLoggedIn &&
             <>
+              <a href="/maps" className="hover:text-gray-400">Find ATMs</a>
               <a href="/user-form" className="hover:text-gray-400">Profile Information</a>
               {/* <a href="/transact" className="hover:text-gray-400">Transact</a> */}
               <a href="#" onClick={handleLogout} className="hover:text-gray-400">Logout</a>

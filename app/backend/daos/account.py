@@ -134,17 +134,12 @@ def close_account(id_: int):
         SET account_status = 'closed'
         WHERE id = %s;
     '''
-    
+    print(id_)
     logger().debug("Closing account for id: %s", id_)
     
     # Execute the query
     result = execute_query(query, (id_,))
-    
-    if result:
-        logger().debug("Account closed successfully for id: %s", id_)
-    else:
-        logger().debug("Failed to close account for id: %s", id_)
-    
+    logger().debug("Account closed successfully for id: %s", id_)
     return result
 
 def deposit_to_account(id_: int, amount: float, record_transaction: bool = True):

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronDown, ChevronUp, Eye, EyeOff, Plus } from "lucide-react"
+import { ChevronDown, ChevronUp, Eye, EyeOff, Plus, MoreVertical } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -18,10 +18,23 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
+interface Account {
+  id: number
+  account_number: number
+  account_type: string
+  balance: string
+  interest_rate: number
+}
 
-
-export function AccountOverview( {accounts, fetchAccounts }) {
+export function AccountOverview({
+  accounts,
+  fetchAccounts,
+}: {
+  accounts: Account[]
+  fetchAccounts: () => Promise<void>
+}) {
   const [showBalance, setShowBalance] = useState(true)
 
   const [error, setError] = useState<string | null>(null)
@@ -33,22 +46,22 @@ export function AccountOverview( {accounts, fetchAccounts }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [accountType, setAccountType] = useState("checking")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false)
+  const [accountToClose, setAccountToClose] = useState<number | null>(null)
+  const [openPopoverId, setOpenPopoverId] = useState<number | null>(null)
 
   useEffect(() => {
     fetchAccounts()
   }, [])
 
-  // Group accounts by type
   const checkingAccounts = accounts.filter((account) => account.account_type === "checking")
   const savingsAccounts = accounts.filter((account) => account.account_type === "savings")
 
-  // Format account number to show only last 4 digits
   const formatAccountNumber = (accountNumber: number) => {
     const accountStr = accountNumber.toString()
     return `••••••${accountStr.slice(-4)}`
   }
 
-  // Format balance with commas and 2 decimal places
   const formatBalance = (balance: string) => {
     const amount = Number.parseFloat(balance)
     return new Intl.NumberFormat("en-US", {
@@ -104,12 +117,43 @@ export function AccountOverview( {accounts, fetchAccounts }) {
     }
   }
 
+  const handleCloseAccount = async () => {
+    if (!accountToClose) return
+
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts/close_account?account_id=${accountToClose}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to close account")
+      }
+
+      setIsCloseDialogOpen(false)
+      setAccountToClose(null)
+      setOpenPopoverId(null)
+      fetchAccounts()
+
+      toast("Your account has been successfully closed.")
+    } catch (error) {
+      console.error("Error closing account:", error)
+      toast("Failed to close account. Please try again later.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const renderAccountsList = (accounts: Account[], borderColor: string, accountType: string) => {
     if (accounts.length === 0) {
       return <div className="py-4 text-center text-muted-foreground">No accounts found</div>
     }
 
-    // Determine how many accounts to show
     const isExpanded = expandedSections[accountType]
     const visibleAccounts = isExpanded ? accounts : accounts.slice(0, 3)
     const hasMoreAccounts = accounts.length > 3
@@ -122,9 +166,42 @@ export function AccountOverview( {accounts, fetchAccounts }) {
             className={cn("border rounded-lg p-4 transition-all hover:shadow-md bg-card", `border-l-4 ${borderColor}`)}
           >
             <div className="space-y-4">
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">Available Balance</div>
-                <div className="text-3xl font-bold">{showBalance ? formatBalance(account.balance) : "$•••••••••"}</div>
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Available Balance</div>
+                  <div className="text-3xl font-bold">
+                    {showBalance ? formatBalance(account.balance) : "$•••••••••"}
+                  </div>
+                </div>
+                <Popover
+                  open={openPopoverId === account.id}
+                  onOpenChange={(open) => {
+                    if (open) {
+                      setOpenPopoverId(account.id)
+                    } else {
+                      setOpenPopoverId(null)
+                    }
+                  }}
+                >
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreVertical className="h-4 w-4" />
+                      <span className="sr-only">Open menu</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-40 p-0" align="end">
+                    <button
+                      className="w-full px-3 py-2 text-red-500 hover:bg-red-50 border border-red-200 rounded-md m-2"
+                      onClick={() => {
+                        setAccountToClose(account.id)
+                        setIsCloseDialogOpen(true)
+                        setOpenPopoverId(null)
+                      }}
+                    >
+                      Close Account
+                    </button>
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -184,7 +261,10 @@ export function AccountOverview( {accounts, fetchAccounts }) {
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="flex items-center gap-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+              <Button
+                size="sm"
+                className="flex items-center gap-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
                 <Plus className="h-4 w-4" /> Open Account
               </Button>
             </DialogTrigger>
@@ -195,33 +275,35 @@ export function AccountOverview( {accounts, fetchAccounts }) {
               </DialogHeader>
 
               <div className="py-4">
-              <RadioGroup value={accountType} onValueChange={setAccountType} className="grid grid-cols-2 gap-4">
-                {["checking", "savings"].map((type) => (
-                  <Label
-                    key={type}
-                    htmlFor={type}
-                    className={cn(
-                      "flex flex-col border-2 rounded-lg p-4 cursor-pointer transition-all",
-                      accountType === type
-                        ? "border-emerald-600 bg-emerald-50"
-                        : "border-muted"
-                    )}
-                  >
-                    <RadioGroupItem value={type} id={type} className="hidden" />
-                    <span className="font-medium capitalize">{type}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {type === "checking" ? "For everyday transactions" : "Earn interest on your money"}
-                    </span>
-                  </Label>
-                ))}
-              </RadioGroup>
+                <RadioGroup value={accountType} onValueChange={setAccountType} className="grid grid-cols-2 gap-4">
+                  {["checking", "savings"].map((type) => (
+                    <Label
+                      key={type}
+                      htmlFor={type}
+                      className={cn(
+                        "flex flex-col border-2 rounded-lg p-4 cursor-pointer transition-all",
+                        accountType === type ? "border-emerald-600 bg-emerald-50" : "border-muted",
+                      )}
+                    >
+                      <RadioGroupItem value={type} id={type} className="hidden" />
+                      <span className="font-medium capitalize">{type}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {type === "checking" ? "For everyday transactions" : "Earn interest on your money"}
+                      </span>
+                    </Label>
+                  ))}
+                </RadioGroup>
               </div>
 
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting}>
                   Cancel
                 </Button>
-                <Button onClick={handleOpenAccount} disabled={isSubmitting} className="bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                <Button
+                  onClick={handleOpenAccount}
+                  disabled={isSubmitting}
+                  className="bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
                   {isSubmitting ? "Opening..." : "Open Account"}
                 </Button>
               </DialogFooter>
@@ -230,21 +312,39 @@ export function AccountOverview( {accounts, fetchAccounts }) {
         </div>
       </CardHeader>
       <CardContent>
-          <Tabs defaultValue="checking">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="checking">Checking ({checkingAccounts.length})</TabsTrigger>
-              <TabsTrigger value="savings">Savings ({savingsAccounts.length})</TabsTrigger>
-            </TabsList>
+        <Tabs defaultValue="checking">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="checking">Checking ({checkingAccounts.length})</TabsTrigger>
+            <TabsTrigger value="savings">Savings ({savingsAccounts.length})</TabsTrigger>
+          </TabsList>
 
-            <TabsContent value="checking" className="pt-4">
-              {renderAccountsList(checkingAccounts, "border-emerald-500", "checking")}
-            </TabsContent>
+          <TabsContent value="checking" className="pt-4">
+            {renderAccountsList(checkingAccounts, "border-emerald-500", "checking")}
+          </TabsContent>
 
-            <TabsContent value="savings" className="pt-4">
-              {renderAccountsList(savingsAccounts, "border-sky-500", "savings")}
-            </TabsContent>
-          </Tabs>
+          <TabsContent value="savings" className="pt-4">
+            {renderAccountsList(savingsAccounts, "border-sky-500", "savings")}
+          </TabsContent>
+        </Tabs>
       </CardContent>
+      <Dialog open={isCloseDialogOpen} onOpenChange={setIsCloseDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Close Account</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to close this account? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setIsCloseDialogOpen(false)} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button onClick={handleCloseAccount} disabled={isSubmitting} variant="destructive">
+              {isSubmitting ? "Closing..." : "Close Account"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }
