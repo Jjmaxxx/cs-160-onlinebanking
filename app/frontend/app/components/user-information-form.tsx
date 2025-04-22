@@ -98,7 +98,7 @@ export function UserInformationForm() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch("http://localhost:12094/user/update", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/update`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

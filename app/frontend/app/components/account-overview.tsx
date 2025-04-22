@@ -75,7 +75,7 @@ export function AccountOverview( {accounts, fetchAccounts }) {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch("http://localhost:12094/accounts/open_account", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts/open_account`, {
         method: "POST",
         credentials: "include",
         headers: {

@@ -1,13 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { DashboardHeader } from "./dashboard-header"
-import { DashboardSidebar } from "./dashboard-sidebar"
 import { AccountOverview } from "./account-overview"
 import { RecentTransactions } from "./recent-transactions"
 import { QuickActions } from "./quick-actions"
-import { FinancialInsights } from "./financial-insights"
-import { UpcomingBills } from "./upcoming-bills"
 import Navbar from '../components/Navbar';
 import { ScheduledBills } from "./scheduled-bills";
 import { useAuth } from '../context/AuthContext';
@@ -26,16 +22,16 @@ type Account = {
 export function DashboardPage() {
   const { isLoggedIn } = useAuth()
   const [accounts, setAccounts] = useState<Account[]>([])
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const fetchAccounts = async () => {
-    const response = await fetch("http://localhost:12094/user/accounts", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/accounts`, {
       method: "GET",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
     })
 
     if (!response.ok) {
-      throw new Error("Failed to fetch accounts")
+      console.log("Failed to fetch accounts")
+      return;
     }
     const data = await response.json();
     const accountsArray = Array.isArray(data) ? data : Object.values(data)

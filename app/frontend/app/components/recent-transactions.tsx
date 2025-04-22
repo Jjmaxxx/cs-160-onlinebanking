@@ -5,7 +5,6 @@ import { Avatar } from "@/components/ui/avatar"
 import { useState, useEffect } from "react";
 import { ArrowDownLeft, ArrowUpRight, ChevronDown, ChevronUp, ChevronRight } from "lucide-react"
 import { format } from "date-fns";
-import Link from "next/link"
 
 
 export function RecentTransactions() {
@@ -43,7 +42,7 @@ export function RecentTransactions() {
   }
 
   useEffect(() => {
-    fetch("http://localhost:12094/user/transactions", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/transactions`, {
       method: "GET",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

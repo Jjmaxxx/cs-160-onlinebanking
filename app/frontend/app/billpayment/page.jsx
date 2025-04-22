@@ -12,9 +12,9 @@ export default function BillManager() {
   const [billDueDate, setBillDueDate] = useState("");
 
   const [trigger, setTrigger] = useState(0);
-
+ 
   useEffect(() => {
-    fetch("http://localhost:12094/user/accounts", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/accounts`, {
       method: "GET",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -31,7 +31,7 @@ export default function BillManager() {
   useEffect(() => {
     if (selectedAccount) {
       fetch(
-        `http://localhost:12094/accounts/get_bill_payments?account_id=${selectedAccount.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/accounts/get_bill_payments?account_id=${selectedAccount.id}`,
         {
           method: "GET",
           credentials: "include",
@@ -53,7 +53,7 @@ export default function BillManager() {
 
     const dueTimestamp = Math.floor(new Date(billDueDate).getTime() / 1000);
 
-    const url = new URL("http://localhost:12094/accounts/register_bill_payment");
+    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/accounts/register_bill_payment`);
     url.searchParams.append("account_id", selectedAccount.id);
     url.searchParams.append("bill_name", billName);
     url.searchParams.append("amount", parseFloat(billAmount));

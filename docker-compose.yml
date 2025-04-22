@@ -26,6 +26,7 @@ services:
     environment:
       - NODE_ENV=development
       - HOST=0.0.0.0
+      - NEXT_PUBLIC_API_URL=http://localhost:12094
     ports:
       - "3000:3000" # Maps port 3000 for frontend (if using React or similar)
     networks:
@@ -43,6 +44,21 @@ services:
     networks:
       - app-network
     restart: always
+  atm:
+    build:
+      context: ./app/atm
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./app/atm:/workdir/app/atm
+      - /workdir/app/atm/node_modules
+    environment:
+      - NODE_ENV=development
+      - HOST=0.0.0.0
+      - NEXT_PUBLIC_API_URL=http://localhost:12094
+    ports:
+      - "3001:3000"
+    networks:
+      - app-network
 
 networks:
   app-network:

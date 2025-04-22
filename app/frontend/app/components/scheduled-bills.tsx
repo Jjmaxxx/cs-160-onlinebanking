@@ -8,7 +8,7 @@ export function ScheduledBills() {
   const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
-    fetch(`http://localhost:12094/accounts/get_all_bill_payments`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts/get_all_bill_payments`, {
       method: "GET",
       credentials: "include",
     })
