@@ -160,14 +160,22 @@ def insert_report_batch(_bank_manager_id, user_reports = None):
     """
 
     # Create report batch and store into db
-    result = execute_query('''
+    execute_query('''
         INSERT INTO report_batches (bank_manager_id)
-        VALUES (%d);
+        VALUES (%s);
     ''', (_bank_manager_id, ))
 
-    logger().debug(result)
+    # fetch the last inserted batch ID
+    query = '''
+        SELECT id FROM report_batches
+        WHERE bank_manager_id = %s
+        ORDER BY created_at DESC
+        LIMIT 1;
+    '''
+    result = fetch_one(query, (_bank_manager_id,))
 
-    return
+    # Print only batch id
+    logger().debug("Batch ID: %s", result["id"])
 
     # Create user reports and store into db
     if user_reports is None:
@@ -181,7 +189,7 @@ def insert_report_batch(_bank_manager_id, user_reports = None):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         '''
         execute_query(query, (
-            result.lastrowid,   # Get the last inserted batch ID
+            result["id"],   # batch_id
             user_report.get("id"),
             user_report.get("full_name"),
             user_report.get("total_accounts"),
@@ -195,4 +203,4 @@ def insert_report_batch(_bank_manager_id, user_reports = None):
         ))
 
     # Return the batch ID for reference
-    return result.lastrowid
+    return result["id"]
