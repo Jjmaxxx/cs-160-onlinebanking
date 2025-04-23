@@ -69,6 +69,24 @@ def get_account(id_):
     
     return account
 
+def get_account_by_number(account_number):
+    """
+    Retrieve account information by account number.
+    """
+    query = '''
+        SELECT * FROM accounts
+        WHERE account_number = %s;
+    '''
+    
+    logger().debug("Fetching account for inumberd: %s", account_number)
+    
+    account = fetch_one(query, (account_number,))
+    
+    if not account:
+        logger().debug("No account found for id: %s", account_number)
+    
+    return account
+
 def user_checking_account(user_id: int):
     """
     Retrieve a checking account for a user.
@@ -116,17 +134,12 @@ def close_account(id_: int):
         SET account_status = 'closed'
         WHERE id = %s;
     '''
-    
+    print(id_)
     logger().debug("Closing account for id: %s", id_)
     
     # Execute the query
     result = execute_query(query, (id_,))
-    
-    if result:
-        logger().debug("Account closed successfully for id: %s", id_)
-    else:
-        logger().debug("Failed to close account for id: %s", id_)
-    
+    logger().debug("Account closed successfully for id: %s", id_)
     return result
 
 def deposit_to_account(id_: int, amount: float, record_transaction: bool = True):
@@ -230,10 +243,10 @@ def get_user_transactions(user_id: int):
     Retrieve all transactions for a user.
     """
     query = '''
-        SELECT * FROM transactions
-        WHERE account_id IN (
-            SELECT id FROM accounts WHERE user_id = %s
-        );
+        SELECT t.*, a.account_number
+        FROM transactions t
+        INNER JOIN accounts a ON t.account_id = a.id
+        WHERE a.user_id = %s;
     '''
     
     logger().debug("Fetching transactions for user_id: %s", user_id)
@@ -284,5 +297,23 @@ def get_bill_payments(account_id: int):
     
     if not payments:
         logger().debug("No bill payments found for account_id: %s", account_id)
+    
+    return payments
+
+
+def get_all_bill_payments(user_id: int):
+    """
+    Retrieve all bill payments from a user.
+    """
+    query = '''
+        SELECT bp.*, a.account_number FROM bill_payments bp
+        LEFT JOIN accounts a ON bp.payee_account_id = a.id 
+        WHERE a.user_id = %s;
+    '''
+    logger().debug("Fetching bill payments for user_id: %s", user_id)
+    
+    payments = fetch_all(query, (user_id,))
+    if not payments:
+        logger().debug("No bill payments found for user_id: %s", user_id)
     
     return payments

@@ -4,6 +4,7 @@ import google_auth_oauthlib.flow
 import requests
 import google.oauth2.credentials
 import os
+from urllib.parse import urlparse
 from dotenv import load_dotenv  
 load_dotenv()
 from daos.auth import add_user
@@ -32,6 +33,7 @@ def get_user_info(token):
     response = requests.get(url, headers=headers).json()
     return response
 def google_authorize_service():
+    port = flask.request.args.get('port', default=3000, type=int)
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
     scopes=SCOPES)
     flow.redirect_uri = flask.url_for('auth.callback', _external=True)
@@ -40,10 +42,12 @@ def google_authorize_service():
         include_granted_scopes='true'
     )
     flask.session['state'] = state
+    flask.session['port'] = port
     return flask.redirect(authorization_url)
 
 def google_callback_service():
     state = flask.session['state']
+    port = flask.session.get('port', 3000)
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
     flow.redirect_uri = flask.url_for('auth.callback', _external=True)
@@ -60,8 +64,8 @@ def google_callback_service():
     user_info = get_user_info(access_token)
     email: str = user_info.get("email")
     add_user(email)
-    frontend_url = os.getenv("FRONTEND_URL")
-    response = flask.make_response(flask.redirect(frontend_url))
+    url = f"http://localhost:{port}"
+    response = flask.make_response(flask.redirect(url))
     response.set_cookie('access_token', access_token)
     return response
 

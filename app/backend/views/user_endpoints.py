@@ -19,7 +19,6 @@ def get_user_endpoint():
 @endpoints.route("/update", methods=["POST"])
 @authenticate
 def update_user_endpoint():
-    print("hi")
     # In a real application, you would update the user info in the database here
     user = request.user
     # For demonstration, let's just return the same user info
@@ -65,7 +64,6 @@ def get_user_transactions_endpoint():
     """
     user = request.user
 
-    print(user)
     # Get user transactions
     try:
         transactions = get_user_transactions(user['id'])
