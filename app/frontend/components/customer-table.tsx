@@ -278,7 +278,7 @@ const columns: ColumnDef<Customer>[] = [
         currency: "USD",
       }).format(amount)
 
-      return <div className="text-right font-medium">{formatted}</div>
+      return <div className="text-left font-medium">{formatted}</div>
     },
   },
   {
@@ -328,6 +328,7 @@ export function CustomerTable() {
   // CUSTOMER TABLE
   const [data, setData] = useState<Customer[]>([])
 
+  // Grabs all accounts and pairs them with their corresponding user
   useEffect(() => {
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/all_user_accounts`, {
         method: "GET",
