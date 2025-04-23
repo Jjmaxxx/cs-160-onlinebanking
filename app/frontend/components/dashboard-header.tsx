@@ -12,6 +12,26 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 export function DashboardHeader() {
+
+
+  const handleLogout = async () => {
+    try {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((response) => response.json())
+      .then((_) => {
+        window.location.href = "/";
+      })
+      .catch((error) => console.error("Fetch error:", error));
+    } catch (error) {
+      console.error('Failed to log out:', error);
+    }
+  }
+
+  
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-6">
       <div className="w-full flex-1">
@@ -57,7 +77,8 @@ export function DashboardHeader() {
           <DropdownMenuItem>Profile</DropdownMenuItem>
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Log out</DropdownMenuItem>
+            {/* Activate handleLogout on click */}
+            <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

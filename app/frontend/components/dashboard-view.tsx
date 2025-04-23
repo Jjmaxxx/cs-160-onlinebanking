@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { BarChart, FileText, Home, PieChart, Settings, Users } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -24,6 +24,24 @@ import {
 
 export default function DashboardView() {
   const [activeTab, setActiveTab] = useState("overview")
+  const [isBankManager, setIsBankManager] = useState(false);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/info`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setIsBankManager(data.id);
+      })
+      .catch((error) => console.error("Fetch error:", error));
+  }, []);
+
+  if (!isBankManager) {
+    return <div>You do not have access to this page.</div>;
+  }
 
   return (
     <SidebarProvider>
