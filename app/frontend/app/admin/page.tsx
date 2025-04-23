@@ -57,7 +57,7 @@ export default function AdminDashboard() {
                     <p className="text-black">Welcome to the admin dashboard.</p>
                 </div>
                 <div className="mt-4">
-                    <h3 className="text-xl font-semibold mb-2 text-black">User List</h3>
+                    <h3 className="text-xl font-semibold mb-2 text-black">Report List</h3>
                     <table className="table-auto w-full border-collapse border border-black">
                         <thead>
                             <tr>
