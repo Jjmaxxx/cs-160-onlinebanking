@@ -1,12 +1,6 @@
-import type { Metadata } from "next"
+import { DashboardPage } from "./components/dashboard-page"
 
-import CustomerDatabasePage from "@/components/bank/customer-database-page"
-
-export const metadata: Metadata = {
-  title: "Customer Database",
-  description: "View and filter customer data",
+export default function Home() {
+  return <DashboardPage />
 }
 
-export default function HomePage() {
-  return <CustomerDatabasePage />
-}
