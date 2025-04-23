@@ -28,9 +28,9 @@ CREATE TABLE IF NOT EXISTS bank_managers(
 
 CREATE TABLE IF NOT EXISTS report_batches(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    manager_id INT,
+    bank_manager_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (manager_id) REFERENCES bank_managers(id) ON DELETE CASCADE
+    FOREIGN KEY (bank_manager_id) REFERENCES bank_managers(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_reports(
@@ -110,6 +110,38 @@ def get_all_users():
     result = fetch_all(query)
     return result
 
+def get_report_batches():
+    """
+    Retrieve all report batches from the database linked with the bank manager's user id.
+    """
+    query = '''
+        SELECT * FROM report_batches rb
+        LEFT JOIN bank_managers bm ON rb.bank_manager_id = bm.id
+        LEFT JOIN users u ON bm.user_id = u.id
+        ORDER BY rb.created_at DESC;
+    '''
+    result = fetch_all(query)
+    logger().debug("Report Batches: %s", result)
+    return result
+
+
+def get_report_batch(batch_id):
+    """
+    Retrieve report batch information by batch ID. Joined with user reports.
+    """
+    query = '''
+        SELECT rb.id AS batch_id, rb.created_at AS batch_created_at,
+            ur.user_id, ur.full_name, ur.total_accounts, ur.total_balance,
+            ur.total_transactions, ur.total_money_deposited,
+            ur.total_money_withdrawn, ur.total_money_transferred,
+            ur.total_money_received, ur.zip_code
+        FROM report_batches rb
+        LEFT JOIN user_reports ur ON rb.id = ur.batch_id
+        WHERE rb.id = %s;
+    '''
+    result = fetch_one(query, (batch_id,))
+    return result
+
 
 def generate_user_reports():
     """
@@ -153,7 +185,6 @@ def user_reports_to_csv_format(user_reports):
         ]) + "\n"
     return csv_data
 
-# TODO: BROKEN
 def insert_report_batch(_bank_manager_id, user_reports = None):
     """
     Insert a report batch with all the user reports.
