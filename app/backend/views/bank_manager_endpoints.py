@@ -2,7 +2,7 @@ import flask
 import os
 from flask import Blueprint, jsonify, request
 from middlewares.auth_middleware import authenticate, bank_manager_authorization
-from daos.bank_manager import get_report_batches, insert_report_batch, generate_user_reports, get_bank_manager, get_all_users, user_reports_to_csv_format
+from daos.bank_manager import get_all_user_accounts, get_report_batches, insert_report_batch, generate_user_reports, get_bank_manager, get_all_users, user_reports_to_csv_format
 
 endpoints = Blueprint('bank_manager_endpoints', __name__)
 
@@ -27,6 +27,21 @@ def get_all_users_endpoint():
         return jsonify({"error": "No users found"}), 404
 
     return jsonify(users), 200
+
+@endpoints.route("/all_user_accounts")
+@authenticate
+@bank_manager_authorization
+def get_all_user_accounts_endpoint():
+    """
+    Endpoint to retrieve all user accounts.
+    """
+    user_accounts = get_all_user_accounts()
+
+    if not user_accounts:
+        return jsonify({"error": "No user accounts found"}), 404
+
+    return jsonify(user_accounts), 200
+
 
 @endpoints.route("/all_report_batches")
 @authenticate

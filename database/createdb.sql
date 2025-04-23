@@ -86,26 +86,26 @@ CREATE TABLE IF NOT EXISTS bill_payments (
 -- Insert dummy data into users table
 INSERT IGNORE INTO users (email, first_name, last_name, address, zip_code, state, city)
 VALUES
-('user1@example.com', 'User1', 'Last1', 'Address1', '10001', 'NY', 'New York'),
-('user2@example.com', 'User2', 'Last2', 'Address2', '10000', 'CA', 'Los Angeles'),
-('user3@example.com', 'User3', 'Last3', 'Address3', '10011', 'TX', 'Houston'),
-('user4@example.com', 'User4', 'Last4', 'Address4', '10000', 'FL', 'Miami'),
-('user5@example.com', 'User5', 'Last5', 'Address5', '10000', 'IL', 'Chicago'),
-('user6@example.com', 'User6', 'Last6', 'Address6', '10006', 'WA', 'Seattle'),
-('user7@example.com', 'User7', 'Last7', 'Address7', '10006', 'NV', 'Las Vegas'),
-('user8@example.com', 'User8', 'Last8', 'Address8', '10006', 'AZ', 'Phoenix'),
-('user9@example.com', 'User9', 'Last9', 'Address9', '10000', 'CO', 'Denver'),
-('user10@example.com', 'User10', 'Last10', 'Address10', '10010', 'GA', 'Atlanta'),
-('user11@example.com', 'User11', 'Last11', 'Address11', '10011', 'MA', 'Boston'),
-('user12@example.com', 'User12', 'Last12', 'Address12', '10011', 'PA', 'Philadelphia'),
-('user13@example.com', 'User13', 'Last13', 'Address13', '10011', 'OH', 'Columbus'),
-('user14@example.com', 'User14', 'Last14', 'Address14', '10014', 'MI', 'Detroit'),
-('user15@example.com', 'User15', 'Last15', 'Address15', '10014', 'NC', 'Charlotte'),
-('user16@example.com', 'User16', 'Last16', 'Address16', '10010', 'OR', 'Portland'),
-('user17@example.com', 'User17', 'Last17', 'Address17', '10017', 'TN', 'Nashville'),
-('user18@example.com', 'User18', 'Last18', 'Address18', '10017', 'MO', 'St. Louis'),
-('user19@example.com', 'User19', 'Last19', 'Address19', '10019', 'WI', 'Milwaukee'),
-('user20@example.com', 'User20', 'Last20', 'Address20', '10020', 'MN', 'Minneapolis');
+('john.doe@example.com', 'John', 'Doe', '123 Elm Street', '10001', 'NY', 'New York'),
+('jane.smith@example.com', 'Jane', 'Smith', '456 Oak Avenue', '10000', 'CA', 'Los Angeles'),
+('michael.johnson@example.com', 'Michael', 'Johnson', '789 Pine Road', '10011', 'TX', 'Houston'),
+('emily.davis@example.com', 'Emily', 'Davis', '321 Maple Lane', '10000', 'FL', 'Miami'),
+('david.wilson@example.com', 'David', 'Wilson', '654 Cedar Drive', '10000', 'IL', 'Chicago'),
+('sarah.moore@example.com', 'Sarah', 'Moore', '987 Birch Boulevard', '10006', 'WA', 'Seattle'),
+('chris.taylor@example.com', 'Chris', 'Taylor', '159 Spruce Circle', '10006', 'NV', 'Las Vegas'),
+('amanda.anderson@example.com', 'Amanda', 'Anderson', '753 Willow Way', '10006', 'AZ', 'Phoenix'),
+('james.thomas@example.com', 'James', 'Thomas', '951 Aspen Court', '10000', 'CO', 'Denver'),
+('lisa.jackson@example.com', 'Lisa', 'Jackson', '852 Poplar Street', '10010', 'GA', 'Atlanta'),
+('robert.white@example.com', 'Robert', 'White', '741 Chestnut Avenue', '10011', 'MA', 'Boston'),
+('karen.harris@example.com', 'Karen', 'Harris', '369 Redwood Drive', '10011', 'PA', 'Philadelphia'),
+('daniel.martin@example.com', 'Daniel', 'Martin', '258 Cypress Lane', '10011', 'OH', 'Columbus'),
+('nancy.lee@example.com', 'Nancy', 'Lee', '147 Magnolia Street', '10014', 'MI', 'Detroit'),
+('kevin.clark@example.com', 'Kevin', 'Clark', '963 Dogwood Road', '10014', 'NC', 'Charlotte'),
+('laura.walker@example.com', 'Laura', 'Walker', '357 Palm Avenue', '10010', 'OR', 'Portland'),
+('brian.hall@example.com', 'Brian', 'Hall', '753 Fir Street', '10017', 'TN', 'Nashville'),
+('megan.allen@example.com', 'Megan', 'Allen', '159 Alder Lane', '10017', 'MO', 'St. Louis'),
+('steven.young@example.com', 'Steven', 'Young', '951 Sequoia Drive', '10019', 'WI', 'Milwaukee'),
+('rachel.king@example.com', 'Rachel', 'King', '852 Sycamore Court', '10020', 'MN', 'Minneapolis');
 
 -- Insert dummy data into accounts table
 INSERT IGNORE INTO accounts (user_id, account_type, balance, account_status)

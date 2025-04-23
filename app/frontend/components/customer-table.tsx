@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -43,189 +43,189 @@ type Customer = {
   status: "active" | "inactive" | "pending"
 }
 
-// Sample customer data
-const data: Customer[] = [
-  {
-    id: "CUST-001",
-    name: "Alice Johnson",
-    email: "alice@example.com",
-    zipCode: "10001",
-    accountType: "Checking",
-    balance: 5240.5,
-    status: "active",
-  },
-  {
-    id: "CUST-002",
-    name: "Robert Smith",
-    email: "robert@example.com",
-    zipCode: "90210",
-    accountType: "Savings",
-    balance: 12750.75,
-    status: "active",
-  },
-  {
-    id: "CUST-003",
-    name: "Carol Williams",
-    email: "carol@example.com",
-    zipCode: "60601",
-    accountType: "Investment",
-    balance: 45000.0,
-    status: "active",
-  },
-  {
-    id: "CUST-004",
-    name: "David Brown",
-    email: "david@example.com",
-    zipCode: "75001",
-    accountType: "Checking",
-    balance: 1250.25,
-    status: "inactive",
-  },
-  {
-    id: "CUST-005",
-    name: "Elizabeth Davis",
-    email: "elizabeth@example.com",
-    zipCode: "20001",
-    accountType: "Savings",
-    balance: 8500.0,
-    status: "active",
-  },
-  {
-    id: "CUST-006",
-    name: "Frank Miller",
-    email: "frank@example.com",
-    zipCode: "33101",
-    accountType: "Investment",
-    balance: 67500.5,
-    status: "active",
-  },
-  {
-    id: "CUST-007",
-    name: "Grace Wilson",
-    email: "grace@example.com",
-    zipCode: "10001",
-    accountType: "Checking",
-    balance: 3200.75,
-    status: "pending",
-  },
-  {
-    id: "CUST-008",
-    name: "Henry Taylor",
-    email: "henry@example.com",
-    zipCode: "90210",
-    accountType: "Savings",
-    balance: 15750.25,
-    status: "active",
-  },
-  {
-    id: "CUST-009",
-    name: "Irene Moore",
-    email: "irene@example.com",
-    zipCode: "60601",
-    accountType: "Investment",
-    balance: 125000.0,
-    status: "active",
-  },
-  {
-    id: "CUST-010",
-    name: "Jack Anderson",
-    email: "jack@example.com",
-    zipCode: "75001",
-    accountType: "Checking",
-    balance: 950.5,
-    status: "inactive",
-  },
-  {
-    id: "CUST-011",
-    name: "Katherine Lewis",
-    email: "katherine@example.com",
-    zipCode: "20001",
-    accountType: "Savings",
-    balance: 22500.0,
-    status: "active",
-  },
-  {
-    id: "CUST-012",
-    name: "Leonard Martin",
-    email: "leonard@example.com",
-    zipCode: "33101",
-    accountType: "Investment",
-    balance: 85000.25,
-    status: "active",
-  },
-  {
-    id: "CUST-013",
-    name: "Mia Rodriguez",
-    email: "mia@example.com",
-    zipCode: "10001",
-    accountType: "Checking",
-    balance: 4250.75,
-    status: "active",
-  },
-  {
-    id: "CUST-014",
-    name: "Nathan Young",
-    email: "nathan@example.com",
-    zipCode: "90210",
-    accountType: "Savings",
-    balance: 18500.5,
-    status: "pending",
-  },
-  {
-    id: "CUST-015",
-    name: "Olivia White",
-    email: "olivia@example.com",
-    zipCode: "60601",
-    accountType: "Investment",
-    balance: 150000.0,
-    status: "active",
-  },
-  {
-    id: "CUST-016",
-    name: "Patrick Garcia",
-    email: "patrick@example.com",
-    zipCode: "75001",
-    accountType: "Checking",
-    balance: 2750.0,
-    status: "active",
-  },
-  {
-    id: "CUST-017",
-    name: "Quinn Thompson",
-    email: "quinn@example.com",
-    zipCode: "20001",
-    accountType: "Savings",
-    balance: 9800.0,
-    status: "active",
-  },
-  {
-    id: "CUST-018",
-    name: "Rachel Martinez",
-    email: "rachel@example.com",
-    zipCode: "33101",
-    accountType: "Investment",
-    balance: 78500.0,
-    status: "active",
-  },
-  {
-    id: "CUST-019",
-    name: "Samuel Parker",
-    email: "samuel@example.com",
-    zipCode: "10001",
-    accountType: "Checking",
-    balance: 3750.25,
-    status: "inactive",
-  },
-  {
-    id: "CUST-020",
-    name: "Tiffany Collins",
-    email: "tiffany@example.com",
-    zipCode: "90210",
-    accountType: "Savings",
-    balance: 16250.75,
-    status: "active",
-  },
-]
+// // Sample customer data
+// const data: Customer[] = [
+//   {
+//     id: "CUST-001",
+//     name: "Alice Johnson",
+//     email: "alice@example.com",
+//     zipCode: "10001",
+//     accountType: "Checking",
+//     balance: 5240.5,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-002",
+//     name: "Robert Smith",
+//     email: "robert@example.com",
+//     zipCode: "90210",
+//     accountType: "Savings",
+//     balance: 12750.75,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-003",
+//     name: "Carol Williams",
+//     email: "carol@example.com",
+//     zipCode: "60601",
+//     accountType: "Investment",
+//     balance: 45000.0,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-004",
+//     name: "David Brown",
+//     email: "david@example.com",
+//     zipCode: "75001",
+//     accountType: "Checking",
+//     balance: 1250.25,
+//     status: "inactive",
+//   },
+//   {
+//     id: "CUST-005",
+//     name: "Elizabeth Davis",
+//     email: "elizabeth@example.com",
+//     zipCode: "20001",
+//     accountType: "Savings",
+//     balance: 8500.0,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-006",
+//     name: "Frank Miller",
+//     email: "frank@example.com",
+//     zipCode: "33101",
+//     accountType: "Investment",
+//     balance: 67500.5,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-007",
+//     name: "Grace Wilson",
+//     email: "grace@example.com",
+//     zipCode: "10001",
+//     accountType: "Checking",
+//     balance: 3200.75,
+//     status: "pending",
+//   },
+//   {
+//     id: "CUST-008",
+//     name: "Henry Taylor",
+//     email: "henry@example.com",
+//     zipCode: "90210",
+//     accountType: "Savings",
+//     balance: 15750.25,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-009",
+//     name: "Irene Moore",
+//     email: "irene@example.com",
+//     zipCode: "60601",
+//     accountType: "Investment",
+//     balance: 125000.0,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-010",
+//     name: "Jack Anderson",
+//     email: "jack@example.com",
+//     zipCode: "75001",
+//     accountType: "Checking",
+//     balance: 950.5,
+//     status: "inactive",
+//   },
+//   {
+//     id: "CUST-011",
+//     name: "Katherine Lewis",
+//     email: "katherine@example.com",
+//     zipCode: "20001",
+//     accountType: "Savings",
+//     balance: 22500.0,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-012",
+//     name: "Leonard Martin",
+//     email: "leonard@example.com",
+//     zipCode: "33101",
+//     accountType: "Investment",
+//     balance: 85000.25,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-013",
+//     name: "Mia Rodriguez",
+//     email: "mia@example.com",
+//     zipCode: "10001",
+//     accountType: "Checking",
+//     balance: 4250.75,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-014",
+//     name: "Nathan Young",
+//     email: "nathan@example.com",
+//     zipCode: "90210",
+//     accountType: "Savings",
+//     balance: 18500.5,
+//     status: "pending",
+//   },
+//   {
+//     id: "CUST-015",
+//     name: "Olivia White",
+//     email: "olivia@example.com",
+//     zipCode: "60601",
+//     accountType: "Investment",
+//     balance: 150000.0,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-016",
+//     name: "Patrick Garcia",
+//     email: "patrick@example.com",
+//     zipCode: "75001",
+//     accountType: "Checking",
+//     balance: 2750.0,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-017",
+//     name: "Quinn Thompson",
+//     email: "quinn@example.com",
+//     zipCode: "20001",
+//     accountType: "Savings",
+//     balance: 9800.0,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-018",
+//     name: "Rachel Martinez",
+//     email: "rachel@example.com",
+//     zipCode: "33101",
+//     accountType: "Investment",
+//     balance: 78500.0,
+//     status: "active",
+//   },
+//   {
+//     id: "CUST-019",
+//     name: "Samuel Parker",
+//     email: "samuel@example.com",
+//     zipCode: "10001",
+//     accountType: "Checking",
+//     balance: 3750.25,
+//     status: "inactive",
+//   },
+//   {
+//     id: "CUST-020",
+//     name: "Tiffany Collins",
+//     email: "tiffany@example.com",
+//     zipCode: "90210",
+//     accountType: "Savings",
+//     balance: 16250.75,
+//     status: "active",
+//   },
+// ]
 
 // Define the columns for the table
 const columns: ColumnDef<Customer>[] = [
@@ -325,6 +325,40 @@ const columns: ColumnDef<Customer>[] = [
 ]
 
 export function CustomerTable() {
+  // CUSTOMER TABLE
+  const [data, setData] = useState<Customer[]>([])
+
+  useEffect(() => {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/all_user_accounts`, {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((response) => response.json())
+        .then((d) => {
+
+          /*  Convert key zip_code to ZipCode, merge first_name and last_name into name, change account_type to accountType, 
+              capitalize accountType value, change account_status to status, and set id to string "CUST-<account_number>",
+              and set balance to number.
+          */
+          const transformedData = d.map((customer: any) => ({
+            id: `CUST-${customer.id}`,
+            name: `${customer.first_name} ${customer.last_name}`,
+            email: customer.email,
+            zipCode: customer.zip_code,
+            accountType: customer.account_type.charAt(0).toUpperCase() + customer.account_type.slice(1),
+            balance: Number(customer.balance),
+            status: customer.account_status
+          }));
+          setData(transformedData);
+          console.log(transformedData)
+
+        })
+        .catch((error) => console.error("Fetch error:", error));
+    }, []);
+
+
+
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})

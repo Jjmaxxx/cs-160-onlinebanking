@@ -110,6 +110,19 @@ def get_all_users():
     result = fetch_all(query)
     return result
 
+def get_all_user_accounts():
+    """
+    Retrieve all accounts from the database with their users.
+    """
+    query = '''
+        SELECT *
+        FROM accounts a
+        LEFT JOIN users u ON a.user_id = u.id
+        ORDER BY a.created_at DESC;
+    '''
+    result = fetch_all(query)
+    return result
+
 def get_report_batches():
     """
     Retrieve all report batches from the database linked with the bank manager's user id.
