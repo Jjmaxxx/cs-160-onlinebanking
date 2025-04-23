@@ -1,24 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
-import { deposit, withdraw, transferToEmail, transferToSelf, deposit_check } from "../utils/api";
-import { AccountDropdown } from "./account_dropdown.jsx";
+import { deposit, withdraw, transferToAccount, transferToSelf } from "../utils/api";
+import  AccountDropdown  from "./account_dropdown";
 
 export default function MoneyManager() {
   const [accounts, setAccounts] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [amount, setAmount] = useState("");
-  const [file, setFile] = useState(null);
-  const [uploadCheckText, setUploadCheckText] = useState("Upload Check");
-
-  const [transferEmail, setTransferEmail] = useState("");
+  const [transferAccountNum, setTransferAccountNum] = useState("");
   const [transferAccount, setTransferAccount] = useState(null);
 
   const [popupType, setPopupType] = useState(null);
   const [trigger, setTrigger] = useState(0);
 
   useEffect(() => {
-    fetch("http://localhost:12094/user/accounts", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/accounts`, {
       method: "GET",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -64,24 +60,19 @@ export default function MoneyManager() {
     } else if (type === "deposit") {
       if (isNaN(numAmount) || numAmount <= 0) return;
       result = deposit(selectedAccount.id, numAmount)
-    }else if(type === "check"){
-      setUploadCheckText("Upload Check");
-      const formData = new FormData();
-      formData.append('check_image', file);
-      result = deposit_check(selectedAccount.id, formData);
     }
      else if (type === "transfer") {
       if (isNaN(numAmount) || numAmount <= 0) return;
-      if (transferEmail && transferEmail.trim() !== "") {
-        result = transferToEmail(
+      if (transferAccountNum && transferAccountNum.trim() !== "") {
+        result = transferToAccount(
           selectedAccount.id,
-          transferEmail,
+          Number(transferAccountNum),
           numAmount
         );
       } else if (transferAccount) {
         result = transferToSelf(
           selectedAccount.id,
-          transferAccount.id,
+          transferAccount.account_number,
           numAmount
         );
       }
@@ -98,16 +89,9 @@ export default function MoneyManager() {
       });
     }
   };
-  const handleFileChange = (e) => {
-    if (e.target.files.length > 0) {
-      setFile(e.target.files[0]);
-      setUploadCheckText(e.target.files[0].name);
-    }
-  };
 
   return (
     <>
-      <Navbar />
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="w-96 p-6 shadow-xl bg-white rounded-2xl">
           <h2 className="text-2xl font-bold text-center mb-4">Transact</h2>
@@ -133,12 +117,6 @@ export default function MoneyManager() {
                   className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
                 >
                   Deposit
-                </button>
-                <button
-                  onClick={() => setPopupType("check")}
-                  className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
-                >
-                  Cash Cheque
                 </button>
                 <button
                   onClick={() => setPopupType("transfer")}
@@ -170,27 +148,14 @@ export default function MoneyManager() {
                   className="mb-4 w-full px-4 py-2 border rounded"
                 />
               )}
-              {(popupType === "check") && (
-                <div className="relative">
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={handleFileChange}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
-                  />
-                  <div className="w-full h-full flex flex-col items-center justify-center border rounded cursor-pointer bg-gray-200 hover:bg-gray-300">
-                    <span className="text-gray-600">{uploadCheckText}</span>
-                  </div>
-                </div>
-              )}
               {popupType === "transfer" && (
                 <>
                   <input
                     type="email"
-                    placeholder="Enter recipient's email"
-                    value={transferEmail}
+                    placeholder="Enter recipient's account Number"
+                    value={transferAccountNum}
                     onChange={(e) => {
-                      setTransferEmail(e.target.value)
+                      setTransferAccountNum(e.target.value)
                       setTransferAccount("");
                     }}
                     className="mb-4 w-full px-4 py-2 border rounded"
@@ -205,7 +170,7 @@ export default function MoneyManager() {
                     selectedAccount={transferAccount}
                     onChange={(acc) => {
                       setTransferAccount(acc);
-                      setTransferEmail(""); // Clear email if account is selected
+                      setTransferAccountNum(""); // Clear email if account is selected
                     }}/>
                 </>
               )}

@@ -16,7 +16,7 @@ def get_user_endpoint():
 
     return jsonify(user)
 
-@endpoints.route("/update", methods=["GET", "POST"])
+@endpoints.route("/update", methods=["POST"])
 @authenticate
 def update_user_endpoint():
     # In a real application, you would update the user info in the database here
@@ -65,8 +65,10 @@ def get_user_transactions_endpoint():
     user = request.user
 
     # Get user transactions
-    transactions = get_user_transactions(user['id'])
+    try:
+        transactions = get_user_transactions(user['id'])
+        return jsonify({"transactions": transactions})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
-    # Return the transactions
-    return jsonify({"transactions": transactions})
 

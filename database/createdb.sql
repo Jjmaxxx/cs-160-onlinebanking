@@ -49,10 +49,12 @@ CREATE TABLE IF NOT EXISTS user_reports(
 
 CREATE TABLE IF NOT EXISTS accounts(
 	id INT AUTO_INCREMENT PRIMARY KEY,
+    account_number BIGINT UNSIGNED UNIQUE,
     user_id INT,
     account_type ENUM('savings', 'checking') DEFAULT 'checking',
     balance DECIMAL(15, 2) DEFAULT 0.00,
-    account_status ENUM('active', 'suspended', 'closed') DEFAULT 'active',
+    interest_rate DECIMAL(5, 2),
+    account_status ENUM('active', 'closed') DEFAULT 'active',
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -154,3 +156,33 @@ VALUES
 ('Payee 15', 15, 1500.00, 'completed'), ('Payee 16', 16, 1600.00, 'pending'),
 ('Payee 17', 17, 1700.00, 'completed'), ('Payee 18', 18, 1800.00, 'pending'),
 ('Payee 19', 19, 1900.00, 'completed'), ('Payee 20', 20, 2000.00, 'pending');
+
+DELIMITER $$
+
+CREATE TRIGGER assign_account_number
+BEFORE INSERT ON accounts
+FOR EACH ROW
+BEGIN
+    DECLARE num_digits INT;
+    DECLARE min_value BIGINT;
+    DECLARE max_value BIGINT;
+    DECLARE random_number BIGINT;
+    SET num_digits = FLOOR(8 + (RAND() * 5)); -- 8, 9, 10, 11, 12
+    SET min_value = POWER(10, num_digits - 1);
+    SET max_value = (POWER(10, num_digits) - 1);
+    SET random_number = FLOOR(min_value + (RAND() * (max_value - min_value + 1)));
+    SET NEW.account_number = random_number;
+END$$
+
+CREATE TRIGGER set_interest_rate
+BEFORE INSERT ON accounts
+FOR EACH ROW
+BEGIN
+    IF NEW.account_type = 'checking' THEN
+        SET NEW.interest_rate = 0.01;
+    ELSEIF NEW.account_type = 'savings' THEN
+        SET NEW.interest_rate = 1.25;
+    END IF;
+END$$
+
+DELIMITER ;

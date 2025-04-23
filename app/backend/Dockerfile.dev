@@ -1,0 +1,15 @@
+FROM python:3.12
+
+WORKDIR /tmp
+
+# install dependencies
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+# expose port
+EXPOSE 8000
+
+WORKDIR /workdir/app/backend
+
+# migrate and then have the development server
+CMD ["flask", "run", "--port=12094", "--host=0.0.0.0", "--debug"]
