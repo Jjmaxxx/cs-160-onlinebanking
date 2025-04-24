@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import { AccountDropdown } from "../transact/account_dropdown.jsx";
+import { AccountDropdown } from "../components/account-dropdown.jsx";
 
 export default function BillManager() {
   const [accounts, setAccounts] = useState([]);
