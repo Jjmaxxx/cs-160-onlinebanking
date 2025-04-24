@@ -5,7 +5,7 @@ WORKDIR /workdir/app/atm
 # install stage
 COPY package-lock.json package-lock.json
 COPY package.json package.json
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # run
 EXPOSE 3000
