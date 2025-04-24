@@ -20,7 +20,6 @@ export function QuickActions({ accounts, fetchAccounts }) {
   const [destinationAccount, setDestinationAccount] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Fetch accounts
   useEffect(() => {
     update()
   }, [])
@@ -91,7 +90,6 @@ export function QuickActions({ accounts, fetchAccounts }) {
       const success = await displayTransactionResult(result)
 
       if (success) {
-        // Reset form
         setAmount("")
         setAccountNumber("")
         setFile(null)
@@ -114,7 +112,6 @@ export function QuickActions({ accounts, fetchAccounts }) {
     }
   }
 
-  // Get the appropriate icon for the transaction type
   const getTransactionIcon = (type) => {
     switch (type) {
       case "send":
