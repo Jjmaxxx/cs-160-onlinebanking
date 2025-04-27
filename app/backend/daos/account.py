@@ -1,7 +1,7 @@
 from db import fetch_all, execute_query, fetch_one
 from services.logger import logger
 import sys
-
+from datetime import datetime
 """
 USER SCHEMA (for copilot to go off of):
 
@@ -301,19 +301,50 @@ def get_bill_payments(account_id: int):
     return payments
 
 
-def get_all_bill_payments(user_id: int):
+def get_all_bill_payments(user_id: int, status: str = "pending"):
     """
     Retrieve all bill payments from a user.
     """
     query = '''
         SELECT bp.*, a.account_number FROM bill_payments bp
         LEFT JOIN accounts a ON bp.payee_account_id = a.id 
-        WHERE a.user_id = %s;
+        WHERE a.user_id = %s AND bp.bill_status = %s;
     '''
     logger().debug("Fetching bill payments for user_id: %s", user_id)
     
-    payments = fetch_all(query, (user_id,))
+    payments = fetch_all(query, (user_id, status))
     if not payments:
         logger().debug("No bill payments found for user_id: %s", user_id)
     
     return payments
+
+def get_bill_payments_today():
+    """
+    Retrieve all bill payments whose payment_date is today or earlier.
+    """
+    query = '''
+        SELECT * FROM bill_payments
+        WHERE payment_date <= %s AND bill_status = 'pending';
+    '''
+    current_time = datetime.now()
+
+    payments = fetch_all(query, (current_time,))
+    if not payments:
+        return None
+
+    return payments
+
+def set_bill_payment_status(bill_id: int, status: str):
+    """
+    Sets the bill payment status to 'failed' or 'completed' for a given bill ID.
+    """
+    if status not in ("failed", "completed"):
+        raise ValueError("Status must be either 'failed' or 'completed'")
+
+    query = '''
+        UPDATE bill_payments
+        SET bill_status = %s
+        WHERE id = %s;
+    '''
+
+    execute_query(query, (status, bill_id))
