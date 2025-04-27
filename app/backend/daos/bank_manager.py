@@ -127,10 +127,16 @@ def get_report_batches():
     """
     Retrieve all report batches from the database linked with the bank manager's user id.
     """
+    # use id and created_by of report_batches
     query = '''
-        SELECT * FROM report_batches rb
+        SELECT rb.id AS batch_id, rb.created_at AS batch_created_at,
+            bm.user_id AS user_id, bm.id AS bank_manager_id, u.first_name, u.last_name, u.email,
+            COUNT(ur.id) AS total_user_reports
+        FROM report_batches rb
         LEFT JOIN bank_managers bm ON rb.bank_manager_id = bm.id
         LEFT JOIN users u ON bm.user_id = u.id
+        LEFT JOIN user_reports ur ON rb.id = ur.batch_id
+        GROUP BY rb.id, bm.user_id, u.first_name, u.last_name
         ORDER BY rb.created_at DESC;
     '''
     result = fetch_all(query)
@@ -152,7 +158,17 @@ def get_report_batch(batch_id):
         LEFT JOIN user_reports ur ON rb.id = ur.batch_id
         WHERE rb.id = %s;
     '''
-    result = fetch_one(query, (batch_id,))
+    result = fetch_all(query, (batch_id,))
+    return result
+
+def get_all_user_reports():
+    """
+    Retrieve all user reports from the database.
+    """
+    query = '''
+        SELECT * FROM user_reports;
+    '''
+    result = fetch_all(query)
     return result
 
 

@@ -1,167 +1,514 @@
 "use client"
 
-import { useState } from "react"
-import { Download, FileDown, Filter } from "lucide-react"
+import { useState, useEffect } from "react"
+import {
+  type ColumnDef,
+  type ColumnFiltersState,
+  type SortingState,
+  type VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+import { ArrowUpDown, ChevronDown, Download, MoreHorizontal, Search } from "lucide-react"
+
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { CustomerDistributionChart } from "@/components/customer-distribution-chart"
-import { BalanceDistributionChart } from "@/components/balance-distribution-chart"
+import { join } from "path"
+import { CardDescription, CardHeader, CardTitle } from "./ui/card"
+
+// Define the report batch data type
+type ReportBatch = {
+  id: string
+  bank_manager_id: string
+  email: string
+  date: string
+}
+
+// Define the report data type
+type UserReport = {
+    user_id: number;
+    full_name: string;
+    total_accounts: number;
+    total_balance: string;
+    total_money_deposited: string;
+    total_money_received: string;
+    total_money_transferred: string;
+    total_money_withdrawn: string;
+    total_transactions: number;
+}
+
+// Define the report batch columns for the table
+const reportBatchColumn: ColumnDef<ReportBatch>[] = [
+  {
+    accessorKey: "id",
+    header: "Report Batch ID",
+    cell: ({ row }) => <div className="font-medium">{row.getValue("id")}</div>,
+  },
+  {
+    accessorKey: "bank_manager_id",
+    header: "Bank Manager ID",
+    cell: ({ row }) => <div>{row.getValue("bank_manager_id")}</div>,
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+  },
+  {
+    accessorKey: "date",
+    header: "Date",
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("date"));
+      return <div>{date.toLocaleDateString()}</div>;
+    },
+  },
+];
+
+// Define the user report columns for the table
+const userReportColumn: ColumnDef<UserReport>[] = [
+  {
+    accessorKey: "user_id",
+    header: "User ID",
+    cell: ({ row }) => <div className="font-medium">{row.getValue("user_id")}</div>,
+  },
+  {
+    accessorKey: "full_name",
+    header: "Full Name",
+    cell: ({ row }) => <div>{row.getValue("full_name")}</div>,
+  },
+  {
+    accessorKey: "total_accounts",
+    header: "Total Accounts",
+    cell: ({ row }) => <div>{row.getValue("total_accounts")}</div>,
+  },
+  {
+    accessorKey: "total_balance",
+    header: "Total Balance",
+    cell: ({ row }) => <div>{row.getValue("total_balance")}</div>,
+  },
+  {
+    accessorKey: "total_money_deposited",
+    header: "Total Money Deposited",
+    cell: ({ row }) => <div>{row.getValue("total_money_deposited")}</div>,
+  },
+  {
+    accessorKey: "total_money_received",
+    header: "Total Money Received",
+    cell: ({ row }) => <div>{row.getValue("total_money_received")}</div>,
+  },
+  {
+    accessorKey: "total_money_transferred",
+    header: "Total Money Transferred",
+    cell: ({ row }) => <div>{row.getValue("total_money_transferred")}</div>,
+  },
+  {
+    accessorKey: "total_money_withdrawn",
+    header: "Total Money Withdrawn",
+    cell: ({ row }) => <div>{row.getValue("total_money_withdrawn")}</div>,
+  },
+  {
+    accessorKey: "total_transactions",
+    header: "Total Transactions",
+    cell: ({ row }) => <div>{row.getValue("total_transactions")}</div>,
+  },
+]
 
 export function ReportGenerator() {
-  const [zipCodes, setZipCodes] = useState<string[]>([])
-  const [balanceRange, setBalanceRange] = useState([0, 100000])
-  const [accountTypes, setAccountTypes] = useState<string[]>([])
-  const [reportType, setReportType] = useState("customer-distribution")
+  // TABLE
+  const [reportBatches, setReportBatches] = useState<ReportBatch[]>([]);
+  const [userReports, setUserReports] = useState<UserReport[]>([]);
+  const [selectedReportBatch, setSelectedReportBatch] = useState<ReportBatch | null>(null);
 
-  const handleZipCodeChange = (zipCode: string) => {
-    setZipCodes((prev) => (prev.includes(zipCode) ? prev.filter((z) => z !== zipCode) : [...prev, zipCode]))
+  // Grabs the specfic user report batch
+  const reportBatchHandler = (id: string) => {
+    setSelectedReportBatch(reportBatches.find((batch) => batch.id === id) || null);
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/user_reports_batch?batch_id=${id}`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+
+        // Fill data to userReports
+        const transformedData = data.map((report: any) => ({
+          user_id: report.user_id,
+          full_name: report.full_name,
+          total_accounts: report.total_accounts,
+          total_balance: report.total_balance,
+          total_money_deposited: report.total_money_deposited,
+          total_money_received: report.total_money_received,
+          total_money_transferred: report.total_money_transferred,
+          total_money_withdrawn: report.total_money_withdrawn,
+          total_transactions: report.total_transactions,
+        }));
+        setUserReports(transformedData);
+      })
+      .catch((error) => console.error("Fetch error:", error))
   }
 
-  const handleAccountTypeChange = (accountType: string) => {
-    setAccountTypes((prev) =>
-      prev.includes(accountType) ? prev.filter((a) => a !== accountType) : [...prev, accountType],
-    )
+
+    // Grabs all reports
+    useEffect(() => {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/all_report_batches`, {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((response) => response.json())
+        .then((d) => {
+
+          console.log(d)
+
+          const transformedData = d.map((report: any) => ({
+            id: report.batch_id,
+            bank_manager_id: report.bank_manager_id,
+            email: report.email,
+            date: report.batch_created_at,
+          }));
+          setReportBatches(transformedData);
+          console.log(transformedData);
+
+        })
+        .catch((error) => console.error("Fetch error:", error));
+    }, []);
+
+
+
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = useState({})
+  const [balanceRange, setBalanceRange] = useState([0, 150000])
+  const [selectedZipCode, setSelectedZipCode] = useState<string>("")
+  const [selectedAccountType, setSelectedAccountType] = useState<string>("")
+  const [selectedStatus, setSelectedStatus] = useState<string>("")
+
+
+  // Apply advanced filters
+  const applyAdvancedFilters = () => {
+    // Clear existing filters first
+    const newColumnFilters: ColumnFiltersState = []
+
+    if (selectedZipCode) {
+      newColumnFilters.push({
+        id: "zipCode",
+        value: selectedZipCode,
+      })
+    }
+
+    if (selectedAccountType) {
+      newColumnFilters.push({
+        id: "accountType",
+        value: selectedAccountType,
+      })
+    }
+
+    if (selectedStatus) {
+      newColumnFilters.push({
+        id: "status",
+        value: selectedStatus,
+      })
+    }
+
+    // Apply balance range filter
+    if (balanceRange[0] > 0 || balanceRange[1] < 150000) {
+      newColumnFilters.push({
+        id: "balance",
+        value: balanceRange,
+      })
+    }
+
+    setColumnFilters(newColumnFilters)
   }
+
+  // Reset all filters
+  const resetFilters = () => {
+    setSelectedZipCode("")
+    setSelectedAccountType("")
+    setSelectedStatus("")
+    setBalanceRange([0, 150000])
+    setColumnFilters([])
+  }
+
+  const reportBatchTable = useReactTable({
+    data: reportBatches,
+    columns: reportBatchColumn,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+    filterFns: {
+      // Custom filter function for balance range
+      balanceRange: (row, id, value: [number, number]) => {
+        const balance = row.getValue(id) as number
+        return balance >= value[0] && balance <= value[1]
+      },
+    },
+  })
+
+  const userReportTable = useReactTable({
+    data: userReports,
+    columns: userReportColumn,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  })
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <div className="space-y-4">
-          <div>
-            <h3 className="mb-2 text-sm font-medium">Zip Codes</h3>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="zipcode-10001"
-                  checked={zipCodes.includes("10001")}
-                  onCheckedChange={() => handleZipCodeChange("10001")}
-                />
-                <Label htmlFor="zipcode-10001">10001 (New York)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="zipcode-90210"
-                  checked={zipCodes.includes("90210")}
-                  onCheckedChange={() => handleZipCodeChange("90210")}
-                />
-                <Label htmlFor="zipcode-90210">90210 (Beverly Hills)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="zipcode-60601"
-                  checked={zipCodes.includes("60601")}
-                  onCheckedChange={() => handleZipCodeChange("60601")}
-                />
-                <Label htmlFor="zipcode-60601">60601 (Chicago)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="zipcode-75001"
-                  checked={zipCodes.includes("75001")}
-                  onCheckedChange={() => handleZipCodeChange("75001")}
-                />
-                <Label htmlFor="zipcode-75001">75001 (Dallas)</Label>
-              </div>
-            </div>
-          </div>
-          <Separator />
-          <div>
-            <h3 className="mb-2 text-sm font-medium">Account Types</h3>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="account-checking"
-                  checked={accountTypes.includes("Checking")}
-                  onCheckedChange={() => handleAccountTypeChange("Checking")}
-                />
-                <Label htmlFor="account-checking">Checking</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="account-savings"
-                  checked={accountTypes.includes("Savings")}
-                  onCheckedChange={() => handleAccountTypeChange("Savings")}
-                />
-                <Label htmlFor="account-savings">Savings</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="account-investment"
-                  checked={accountTypes.includes("Investment")}
-                  onCheckedChange={() => handleAccountTypeChange("Investment")}
-                />
-                <Label htmlFor="account-investment">Investment</Label>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="w-full space-y-4">
+      {/* Line separator */}
+      <div className="border-b border-gray-200" />
 
-        <div className="space-y-4">
-          <div>
-            <h3 className="mb-2 text-sm font-medium">Balance Range</h3>
-            <div className="space-y-6 pt-4">
-              <Slider
-                defaultValue={[0, 100000]}
-                max={150000}
-                step={1000}
-                value={balanceRange}
-                onValueChange={setBalanceRange}
-              />
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">${balanceRange[0].toLocaleString()}</span>
-                <span className="text-sm text-muted-foreground">${balanceRange[1].toLocaleString()}</span>
-              </div>
-            </div>
-          </div>
-          <Separator />
-          <div>
-            <h3 className="mb-2 text-sm font-medium">Report Type</h3>
-            <Select value={reportType} onValueChange={setReportType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select report type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="customer-distribution">Customer Distribution</SelectItem>
-                <SelectItem value="balance-distribution">Balance Distribution</SelectItem>
-                <SelectItem value="account-types">Account Types</SelectItem>
-                <SelectItem value="transaction-volume">Transaction Volume</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+      {/* REPORT BATCHES */}
+      <CardHeader>
+        <CardTitle>Report Batch</CardTitle>
+        <CardDescription>
+          Select a report batch to view user reports.
+        </CardDescription>
+      </CardHeader>
 
-        <div className="space-y-4">
-          <div>
-            <h3 className="mb-2 text-sm font-medium">Report Actions</h3>
-            <div className="space-y-2">
-              <Button className="w-full" onClick={() => {}}>
-                <Filter className="mr-2 h-4 w-4" />
-                Apply Filters
-              </Button>
-              <Button variant="outline" className="w-full" onClick={() => {}}>
-                <FileDown className="mr-2 h-4 w-4" />
-                Export as CSV
-              </Button>
-              <Button variant="outline" className="w-full" onClick={() => {}}>
-                <Download className="mr-2 h-4 w-4" />
-                Download PDF Report
-              </Button>
-            </div>
-          </div>
-        </div>
+      {/* Search and filter options */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline">
+          Columns <ChevronDown className="ml-2 h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {reportBatchTable
+          .getAllColumns()
+          .filter((column) => column.getCanHide())
+          .map((column) => {
+            return (
+            <DropdownMenuCheckboxItem
+              key={column.id}
+              className="capitalize"
+              checked={column.getIsVisible()}
+              onCheckedChange={(value) => column.toggleVisibility(!!value)}
+            >
+              {column.id}
+            </DropdownMenuCheckboxItem>
+            )
+          })}
+        </DropdownMenuContent>
+        </DropdownMenu>
+        <div className="flex items-center gap-2">
+        <Button variant="default" className="bg-black text-white">
+        Generate New Report
+        </Button>
+        <Button variant="outline">
+        <Download className="mr-2 h-4 w-4" />
+        Export All
+        </Button>
+      </div>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
-          {reportType === "customer-distribution" ? <CustomerDistributionChart /> : <BalanceDistributionChart />}
-        </CardContent>
-      </Card>
+      {/* Report Batch Table */}
+      <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+        {reportBatchTable.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id}>
+          {headerGroup.headers.map((header) => {
+            return (
+            <TableHead key={header.id}>
+              {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+            </TableHead>
+            )
+          })}
+          </TableRow>
+        ))}
+        </TableHeader>
+        <TableBody>
+        {reportBatchTable.getRowModel().rows?.length ? (
+          reportBatchTable.getRowModel().rows.map((row) => (
+          <TableRow
+            key={row.id}
+            data-state={row.getIsSelected() && "selected"}
+            className="cursor-pointer"
+            onClick={() => reportBatchHandler(row.original.id)}
+          >
+            {row.getVisibleCells().map((cell) => (
+            <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+            ))}
+          </TableRow>
+          ))
+        ) : (
+          <TableRow>
+          <TableCell colSpan={reportBatchColumn.length} className="h-24 text-center">
+            No results.
+          </TableCell>
+          </TableRow>
+        )}
+        </TableBody>
+      </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex-1 text-sm text-muted-foreground">
+        {reportBatchTable.getFilteredRowModel().rows.length} of {reportBatches.length} row(s) displayed.
+      </div>
+      <div className="space-x-2">
+        <Button
+        variant="outline"
+        size="sm"
+        onClick={() => reportBatchTable.previousPage()}
+        disabled={!reportBatchTable.getCanPreviousPage()}
+        >
+        Previous
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => reportBatchTable.nextPage()} disabled={!reportBatchTable.getCanNextPage()}>
+        Next
+        </Button>
+      </div>
+      </div>
+
+      {/* Line separator */}
+      <div className="border-b border-gray-200" />
+
+
+      {/* USER REPORTS */}
+      <CardHeader>
+        <CardTitle>User Reports</CardTitle>
+        <CardDescription>
+          User Reports for Report Batch: {selectedReportBatch ? selectedReportBatch.id : "None"}
+        </CardDescription>
+      </CardHeader>
+
+      {/* Search and filter options */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline">
+          Columns <ChevronDown className="ml-2 h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {userReportTable
+          .getAllColumns()
+          .filter((column) => column.getCanHide())
+          .map((column) => {
+            return (
+            <DropdownMenuCheckboxItem
+              key={column.id}
+              className="capitalize"
+              checked={column.getIsVisible()}
+              onCheckedChange={(value) => column.toggleVisibility(!!value)}
+            >
+              {column.id}
+            </DropdownMenuCheckboxItem>
+            )
+          })}
+        </DropdownMenuContent>
+        </DropdownMenu>
+        <div className="flex items-center gap-2">
+        <Button variant="outline">
+        <Download className="mr-2 h-4 w-4" />
+        Export
+        </Button>
+      </div>
+      </div>
+
+      {/* User Report Table */}
+      <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+        {userReportTable.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id}>
+          {headerGroup.headers.map((header) => {
+        return (
+        <TableHead key={header.id}>
+          {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+        </TableHead>
+        )
+          })}
+          </TableRow>
+        ))}
+        </TableHeader>
+        <TableBody>
+        {userReportTable.getRowModel().rows?.length ? (
+          userReportTable.getRowModel().rows.map((row) => (
+          <TableRow
+        key={row.id}
+        data-state={row.getIsSelected() && "selected"}
+        className="cursor-pointer"
+          >
+        {row.getVisibleCells().map((cell) => (
+        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+        ))}
+          </TableRow>
+          ))
+        ) : (
+          <TableRow>
+          <TableCell colSpan={userReportColumn.length} className="h-24 text-center">
+        No results.
+          </TableCell>
+          </TableRow>
+        )}
+        </TableBody>
+      </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex-1 text-sm text-muted-foreground">
+        {userReportTable.getFilteredRowModel().rows.length} of {userReports.length} row(s) displayed.
+      </div>
+      <div className="space-x-2">
+        <Button
+        variant="outline"
+        size="sm"
+        onClick={() => userReportTable.previousPage()}
+        disabled={!userReportTable.getCanPreviousPage()}
+        >
+        Previous
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => userReportTable.nextPage()} disabled={!userReportTable.getCanNextPage()}>
+        Next
+        </Button>
+      </div>
+      </div>
     </div>
   )
 }

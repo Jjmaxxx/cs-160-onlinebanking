@@ -31,12 +31,23 @@ export default function AdminDashboard() {
                 console.log(data.csv_user_reports);
 
                 // Using user reports for now, will use csv_user_reports later
-                console.log(data.user_reports);
+                // console.log(data.user_reports);
                 setReports(data.user_reports);
         })
         .catch((error) => console.error("Fetch error:", error));
 
-        fetch("http://localhost:12094/bank_manager/all_report_batches", {
+        // fetch("http://localhost:12094/bank_manager/all_report_batches", {
+        //     method: "GET",
+        //     credentials: "include",
+        //     headers: { "Content-Type": "application/json" },
+        // })
+        //     .then((response) => response.json())
+        //     .then((data) => {
+        //         console.log(data);
+        // })
+        // .catch((error) => console.error("Fetch error:", error));
+
+        fetch("http://localhost:12094/bank_manager/user_reports_batch?batch_id=2", {
             method: "GET",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -47,6 +58,8 @@ export default function AdminDashboard() {
         })
         .catch((error) => console.error("Fetch error:", error));
     }, []);
+
+    
 
     return (
         <div className="flex flex-col h-screen">

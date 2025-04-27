@@ -194,8 +194,8 @@ export default function DashboardView() {
               <TabsContent value="reports" className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Report Generator</CardTitle>
-                    <CardDescription>Generate custom reports based on customer attributes</CardDescription>
+                    <CardTitle>Reports</CardTitle>
+                    <CardDescription>Generate and view reports</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ReportGenerator />

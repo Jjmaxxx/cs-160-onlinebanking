@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS report_batches(
 
 CREATE TABLE IF NOT EXISTS user_reports(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    batch_id INT,
-    user_id INT NOT NULL UNIQUE,
+    batch_id INT NOT NULL,
+    user_id INT NOT NULL,
     full_name VARCHAR(100) NOT NULL,
     total_accounts INT DEFAULT 0,
     total_balance DECIMAL(15, 2) DEFAULT 0.00,

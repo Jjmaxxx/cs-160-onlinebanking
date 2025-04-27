@@ -2,7 +2,7 @@ import flask
 import os
 from flask import Blueprint, jsonify, request
 from middlewares.auth_middleware import authenticate, bank_manager_authorization
-from daos.bank_manager import get_all_user_accounts, get_report_batches, insert_report_batch, generate_user_reports, get_bank_manager, get_all_users, user_reports_to_csv_format
+from daos.bank_manager import get_all_user_accounts, get_all_user_reports, get_report_batch, get_report_batches, insert_report_batch, generate_user_reports, get_bank_manager, get_all_users, user_reports_to_csv_format
 
 endpoints = Blueprint('bank_manager_endpoints', __name__)
 
@@ -57,6 +57,21 @@ def get_all_report_batches():
 
     return jsonify(report_batches), 200
 
+@endpoints.route("/user_reports_batch")
+@authenticate
+@bank_manager_authorization
+def get_user_reports_batch():
+    """
+    Endpoint to retrieve user reports batch.
+    """
+    batch_id = request.args.get('batch_id')
+ 
+    user_reports = get_report_batch(batch_id)
+
+
+    return jsonify(user_reports), 200
+
+
 @endpoints.route("/generate_report", methods=["POST"])
 @authenticate
 @bank_manager_authorization
@@ -71,7 +86,7 @@ def generate_report_endpoint():
     bank_manager_id = bank_manager['id']
 
     # Add to database
-    insert_report_batch(bank_manager_id, user_reports)
+    batch_id = insert_report_batch(bank_manager_id, user_reports)
 
     # Return as csv_file
     csv_user_reports = user_reports_to_csv_format(user_reports)
