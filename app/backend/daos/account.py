@@ -318,6 +318,22 @@ def get_all_bill_payments(user_id: int, status: str = "pending"):
     
     return payments
 
+def become_admin(user_id: int):
+    """
+    Update the user to become an admin.
+    """
+    query = '''
+        INSERT INTO bank_managers (user_id) VALUES (%s);
+    '''
+    
+    logger().debug("Updating user_id: %s to become admin", user_id)
+    
+    result = execute_query(query, (user_id,))
+    
+    if result:
+        logger().debug("User_id: %s is now an admin", user_id)
+    
+    return result
 def get_bill_payments_today():
     """
     Retrieve all bill payments whose payment_date is today or earlier.
