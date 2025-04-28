@@ -8,10 +8,12 @@ from views.user_endpoints import endpoints as user_endpoints
 from views.account_endpoints import endpoints as account_endpoints
 from views.bank_manager_endpoints import endpoints as bank_manager_endpoints
 from middlewares.auth_middleware import authenticate
-import requests
+from flask_apscheduler import APScheduler
+from scheduler_jobs import start_scheduler
 
 load_dotenv()
 app = Flask(__name__)
+scheduler = APScheduler()
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(user_endpoints, url_prefix='/user')
 app.register_blueprint(account_endpoints, url_prefix='/accounts')
@@ -57,6 +59,9 @@ def proxy_request():
         cached_response = f.read()
     app.logger.warn("Returning response: %s", cached_response)
     return jsonify(cached_response)
+
+
+start_scheduler(app)
 
 if __name__ == '__main__':
     app.run(debug=True, port=12094)
