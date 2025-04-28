@@ -136,6 +136,7 @@ export function ReportGenerator() {
   // TABLE
   const [reportBatches, setReportBatches] = useState<ReportBatch[]>([]);
   const [userReports, setUserReports] = useState<UserReport[]>([]);
+  const [csvUserReports, setCsvUserReports] = useState<string>("");
   const [selectedReportBatch, setSelectedReportBatch] = useState<ReportBatch | null>(null);
   const [trigger, setTrigger] = useState(0);
   const [triggerCurrentReport, setTriggerCurrentReport] = useState(0);
@@ -165,10 +166,36 @@ export function ReportGenerator() {
           total_transactions: report.total_transactions,
         }));
         setUserReports(transformedData);
+        setCsvUserReports(data.csv_user_reports); // Set the CSV data for download
       })
       .catch((error) => console.error("Fetch error:", error))
 
       setSelectedReportBatch(reportBatches.find((batch) => batch.id === id) || null);
+  }
+
+  // Function to handle export all
+  const handleExportAll = () => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/all_user_reports_with_batch`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+
+
+            const blob = new Blob([data.csv_user_reports], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "all_user_reports.csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+    })
+    .catch((error) => console.error("Fetch error:", error));
+    
   }
 
   // Function to generate a new report
@@ -214,6 +241,7 @@ export function ReportGenerator() {
             console.log(transformedData);
 
             setUserReports(transformedData);
+            setCsvUserReports(data.csv_user_reports); // Set the CSV data for download
     })
     .catch((error) => console.error("Fetch error:", error));
 
@@ -393,7 +421,7 @@ export function ReportGenerator() {
         >
           Generate New Report
         </Button>
-        <Button variant="outline">
+        <Button variant="outline" onClick={handleExportAll}>
         <Download className="mr-2 h-4 w-4" />
         Export All
         </Button>
@@ -505,9 +533,22 @@ export function ReportGenerator() {
         >
           See Current Report
         </Button>
-        <Button variant="outline">
-        <Download className="mr-2 h-4 w-4" />
-        Export
+        <Button
+          variant="outline"
+          onClick={() => {
+            const blob = new Blob([csvUserReports], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "user_reports.csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+          }}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Export
         </Button>
       </div>
       </div>

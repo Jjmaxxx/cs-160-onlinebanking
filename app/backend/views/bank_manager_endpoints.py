@@ -3,7 +3,7 @@ from services.logger import logger
 import os
 from flask import Blueprint, jsonify, request
 from middlewares.auth_middleware import authenticate, bank_manager_authorization
-from daos.bank_manager import get_all_user_accounts, get_all_user_reports, get_report_batch, get_report_batches, insert_report_batch, generate_user_reports, get_bank_manager, get_all_users, user_reports_to_csv_format, summarize_transactions, get_all_transactions
+from daos.bank_manager import get_all_user_accounts, get_all_user_reports, get_all_user_reports_with_batch, get_report_batch, get_report_batches, insert_report_batch, generate_user_reports, get_bank_manager, get_all_users, user_reports_to_csv_format, summarize_transactions, get_all_transactions, user_reports_with_batch_to_csv_format
 
 endpoints = Blueprint('bank_manager_endpoints', __name__)
 
@@ -57,6 +57,36 @@ def get_all_report_batches():
         return jsonify({"error": "No report batches found"}), 404
 
     return jsonify(report_batches), 200
+
+@endpoints.route("/all_user_reports")
+@authenticate
+@bank_manager_authorization
+def get_all_user_reports_endpoint():
+    """
+    Endpoint to retrieve all user reports.
+    """
+    user_reports = get_all_user_reports()
+
+    if not user_reports:
+        return jsonify({"error": "No user reports found"}), 404
+
+    return jsonify(user_reports), 200
+
+@endpoints.route("/all_user_reports_with_batch", methods=["POST"])
+@authenticate
+@bank_manager_authorization
+def get_all_user_reports_with_batch_endpoint():
+    """
+    Endpoint to retrieve all user reports with batch.
+    """
+    user_reports = get_all_user_reports_with_batch()
+
+    csv_user_reports = user_reports_with_batch_to_csv_format(user_reports)
+
+    if not user_reports:
+        return jsonify({"error": "No user reports found"}), 404
+
+    return jsonify({"csv_user_reports": csv_user_reports, "user_reports": user_reports}), 200
 
 @endpoints.route("/user_reports_batch")
 @authenticate

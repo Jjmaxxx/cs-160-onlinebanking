@@ -162,6 +162,48 @@ def get_report_batch(batch_id):
     result = fetch_all(query, (batch_id,))
     return result
 
+def get_all_user_reports_with_batch():
+    """
+    Retrieve all user reports with their batch information.
+    """
+    query = '''
+        SELECT ur.*, rb.created_at AS batch_created_at, bm.user_id AS bank_manager_id,
+            u.first_name, u.last_name, u.email
+        FROM user_reports ur
+        LEFT JOIN report_batches rb ON ur.batch_id = rb.id
+        LEFT JOIN bank_managers bm ON rb.bank_manager_id = bm.id
+        LEFT JOIN users u ON ur.user_id = u.id;
+    '''
+    result = fetch_all(query)
+    return result
+
+def user_reports_with_batch_to_csv_format(user_reports_with_batch):
+    """
+    Convert user reports with batch to CSV format.
+    """
+    csv_data = "Batch ID,Batch Created At,User ID,Full Name,Total Accounts,Total Balance,Total Transactions,Total Money Deposited,Total Money Withdrawn,Total Money Transferred,Total Money Received,Zip Code,Bank Manager ID,First Name,Last Name,Email\n"
+    for user_report in user_reports_with_batch:
+        csv_data += ",".join([
+            str(user_report.get("batch_id", "")),
+            str(user_report.get("batch_created_at", "")),
+            str(user_report.get("user_id", "")),
+            str(user_report.get("full_name", "")),
+            str(user_report.get("total_accounts", "")),
+            str(user_report.get("total_balance", "")),
+            str(user_report.get("total_transactions", "")),
+            str(user_report.get("total_money_deposited", "")),
+            str(user_report.get("total_money_withdrawn", "")),
+            str(user_report.get("total_money_transferred", "")),
+            str(user_report.get("total_money_received", "")),
+            str(user_report.get("zip_code", "")),
+            str(user_report.get("bank_manager_id", "")),
+            str(user_report.get("first_name", "")),
+            str(user_report.get("last_name", "")),
+            str(user_report.get("email", ""))
+        ]) + "\n"
+    return csv_data
+
+
 def get_all_user_reports():
     """
     Retrieve all user reports from the database.
