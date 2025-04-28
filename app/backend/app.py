@@ -6,6 +6,7 @@ from db import get_db_connection
 from views.auth import auth
 from views.user_endpoints import endpoints as user_endpoints
 from views.account_endpoints import endpoints as account_endpoints
+from views.bank_manager_endpoints import endpoints as bank_manager_endpoints
 from middlewares.auth_middleware import authenticate
 from flask_apscheduler import APScheduler
 from scheduler_jobs import start_scheduler
@@ -16,10 +17,11 @@ scheduler = APScheduler()
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(user_endpoints, url_prefix='/user')
 app.register_blueprint(account_endpoints, url_prefix='/accounts')
+app.register_blueprint(bank_manager_endpoints, url_prefix='/bank_manager')
 
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
 app.config['CORS_HEADERS'] = 'Content-Type'
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "*", "methods": "GET,POST"}}, supports_credentials=True)
 
 @app.before_request
 def before_request():
