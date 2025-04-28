@@ -70,7 +70,7 @@ export function DashboardHeader() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
             <DropdownMenuItem asChild>
-            <a href="/user-form">Profile</a>
+            <a href="/">Home</a>
             </DropdownMenuItem>
           <DropdownMenuSeparator />
             {/* Activate handleLogout on click */}

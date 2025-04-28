@@ -259,6 +259,12 @@ export function ReportGenerator() {
       .then((response) => response.json())
       .then((d) => {
 
+        // Dismiss if empty
+        if (d.length === 0) {
+          setReportBatches([]);
+          return;
+        }
+
         const transformedData = d.map((report: any) => ({
           id: report.batch_id,
           bank_manager_id: report.bank_manager_id,
