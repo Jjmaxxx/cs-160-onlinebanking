@@ -63,7 +63,9 @@ def google_callback_service():
     access_token = credentials.get('token')
     user_info = get_user_info(access_token)
     email: str = user_info.get("email")
-    add_user(email)
+    first_name: str = user_info.get("given_name")
+    last_name: str = user_info.get("family_name")
+    add_user(email, first_name, last_name)
     url = f"http://localhost:{port}"
     response = flask.make_response(flask.redirect(url))
     response.set_cookie('access_token', access_token)
