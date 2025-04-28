@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
@@ -12,6 +13,21 @@ function Navbar() {
       console.error('Error during Google login request:', error);
     }
   };
+
+  const [isBankManager, setIsBankManager] = useState(false);
+  
+    useEffect(() => {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/info`, {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setIsBankManager(data.id);
+        })
+        .catch((error) => console.error("Fetch error:", error));
+    }, []);
 
   const handleLogout = async () => {
     try {
@@ -56,9 +72,13 @@ function Navbar() {
           {isLoggedIn &&
             <>
               <a href="/maps" className="hover:text-gray-400">Find ATMs</a>
-              <a href="/user-form" className="hover:text-gray-400">Profile Information</a>
-              <a onClick={handleAdmin} className='hover:text-gray-400'>Become an Admin</a>
-              {/* <a href="/transact" className="hover:text-gray-400">Transact</a> */}
+                <a href="/user-form" className="hover:text-gray-400">Profile Information</a>
+                {isBankManager ? (
+                <a href="/dashboard" className="hover:text-gray-400">Dashboard</a>
+                ) : (
+                <a onClick={handleAdmin} className="hover:text-gray-400">Become an Admin</a>
+                )}
+                {/* <a href="/transact" className="hover:text-gray-400">Transact</a> */}
               <a href="#" onClick={handleLogout} className="hover:text-gray-400">Logout</a>
             </>
           }

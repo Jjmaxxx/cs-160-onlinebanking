@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/sidebar"
 
 export default function DashboardView() {
-  const [activeTab, setActiveTab] = useState("overview")
+  const [activeTab, setActiveTab] = useState("customers")
   const [isBankManager, setIsBankManager] = useState(false);
 
   useEffect(() => {
@@ -53,14 +53,6 @@ export default function DashboardView() {
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={activeTab === "overview"} onClick={() => setActiveTab("overview")}>
-                  <button>
-                    <Home className="h-4 w-4" />
-                    <span>Overview</span>
-                  </button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
                   isActive={activeTab === "customers"}
@@ -80,28 +72,12 @@ export default function DashboardView() {
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={activeTab === "analytics"}
-                  onClick={() => setActiveTab("analytics")}
-                >
-                  <button>
-                    <BarChart className="h-4 w-4" />
-                    <span>Analytics</span>
-                  </button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter className="border-t p-4">
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <button>
-                    <Settings className="h-4 w-4" />
-                    <span>Settings</span>
-                  </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -112,10 +88,8 @@ export default function DashboardView() {
           <DashboardShell>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
               <TabsList>
-                <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="customers">Customers</TabsTrigger>
                 <TabsTrigger value="reports">Reports</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
               </TabsList>
               <TabsContent value="overview" className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
