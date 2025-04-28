@@ -259,20 +259,19 @@ export function ReportGenerator() {
       .then((response) => response.json())
       .then((d) => {
 
-        // Dismiss if empty
-        if (d.length === 0) {
-          setReportBatches([]);
-          return;
+
+        try {
+          const transformedData = d.map((report: any) => ({
+            id: report.batch_id,
+            bank_manager_id: report.bank_manager_id,
+            email: report.email,
+            date: report.batch_created_at,
+          }));
+          setReportBatches(transformedData);
+        } catch (error) {
+          console.log(d);
         }
-
-        const transformedData = d.map((report: any) => ({
-          id: report.batch_id,
-          bank_manager_id: report.bank_manager_id,
-          email: report.email,
-          date: report.batch_created_at,
-        }));
-        setReportBatches(transformedData);
-
+        
       })
       .catch((error) => console.error("Fetch error:", error));
   }, [trigger, triggerCurrentReport]);

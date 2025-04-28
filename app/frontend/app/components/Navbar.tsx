@@ -74,9 +74,9 @@ function Navbar() {
               <a href="/maps" className="hover:text-gray-400">Find ATMs</a>
                 <a href="/user-form" className="hover:text-gray-400">Profile Information</a>
                 {isBankManager ? (
-                <a href="/dashboard" className="hover:text-gray-400">Dashboard</a>
+                <a href="/dashboard" className="hover:text-gray-400">Admin Dashboard</a>
                 ) : (
-                <a onClick={handleAdmin} className="hover:text-gray-400">Become an Admin</a>
+                <a href="#" onClick={handleAdmin} className="hover:text-gray-400">Become an Admin</a>
                 )}
                 {/* <a href="/transact" className="hover:text-gray-400">Transact</a> */}
               <a href="#" onClick={handleLogout} className="hover:text-gray-400">Logout</a>
