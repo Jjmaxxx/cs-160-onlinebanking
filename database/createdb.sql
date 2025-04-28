@@ -111,13 +111,13 @@ VALUES
 INSERT IGNORE INTO accounts (user_id, account_type, balance, account_status)
 VALUES
 (1, 'savings', 1000.75, 'active'), (1, 'checking', 500.50, 'active'), (1, 'savings', 1500.25, 'active'), (1, 'checking', 2000.80, 'active'), (1, 'savings', 2500.60, 'active'),
-(2, 'checking', 500.45, 'active'), (3, 'savings', 2000.30, 'active'), (4, 'checking', 1500.90, 'inactive'),
+(2, 'checking', 500.45, 'active'), (3, 'savings', 2000.30, 'active'), (4, 'checking', 1500.90, 'closed'),
 (5, 'savings', 3000.15, 'active'), (6, 'checking', 2500.70, 'active'), (7, 'savings', 4000.85, 'active'),
-(8, 'checking', 3500.95, 'active'), (9, 'savings', 5000.40, 'inactive'), (10, 'checking', 4500.25, 'active'),
+(8, 'checking', 3500.95, 'active'), (9, 'savings', 5000.40, 'closed'), (10, 'checking', 4500.25, 'active'),
 (11, 'savings', 6000.10, 'active'), (12, 'checking', 5500.55, 'active'), (13, 'savings', 7000.35, 'active'),
 (14, 'checking', 6500.20, 'active'), (15, 'savings', 8000.75, 'active'), (16, 'checking', 7500.60, 'active'),
-(17, 'savings', 9000.50, 'active'), (18, 'checking', 8500.45, 'pending'), (19, 'savings', 10000.80, 'active'),
-(20, 'checking', 9500.95, 'inactive');
+(17, 'savings', 9000.50, 'active'), (18, 'checking', 8500.45, 'closed'), (19, 'savings', 10000.80, 'active'),
+(20, 'checking', 9500.95, 'closed');
 
 -- Insert dummy data into transactions table
 INSERT IGNORE INTO transactions (account_id, transaction_type, amount, transaction_status, destination_account_id)

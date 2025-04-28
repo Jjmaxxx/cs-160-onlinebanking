@@ -40,7 +40,7 @@ type Customer = {
   zipCode: string
   accountType: string
   balance: number
-  status: "active" | "inactive" | "pending"
+  status: "active" | "closed"
 }
 
 // Define the report data type
@@ -112,35 +112,7 @@ const columns: ColumnDef<Customer>[] = [
         </Badge>
       )
     },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const customer = row.original
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(customer.id)}>
-              Copy customer ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer details</DropdownMenuItem>
-            <DropdownMenuItem>Edit customer</DropdownMenuItem>
-            <DropdownMenuItem>View transaction history</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
-  },
+  }
 ]
 
 export function CustomerTable() {
@@ -321,7 +293,6 @@ export function CustomerTable() {
                   <SelectValue placeholder="Select zip code" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All zip codes</SelectItem>
                   {uniqueZipCodes.map((zipCode) => (
                     <SelectItem key={zipCode} value={zipCode}>
                       {zipCode}
@@ -337,7 +308,6 @@ export function CustomerTable() {
                   <SelectValue placeholder="Select account type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All account types</SelectItem>
                   <SelectItem value="Checking">Checking</SelectItem>
                   <SelectItem value="Savings">Savings</SelectItem>
                   <SelectItem value="Investment">Investment</SelectItem>
@@ -351,10 +321,8 @@ export function CustomerTable() {
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All statuses</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="closed">Closed</SelectItem>
                 </SelectContent>
               </Select>
             </div>
