@@ -69,8 +69,9 @@ def get_user_reports_batch():
  
     user_reports = get_report_batch(batch_id)
 
+    csv_user_reports = user_reports_to_csv_format(user_reports)
 
-    return jsonify(user_reports), 200
+    return jsonify({"csv_user_reports": csv_user_reports, "user_reports": user_reports}), 200
 
 
 @endpoints.route("/generate_report", methods=["POST"])
@@ -91,6 +92,30 @@ def generate_report_endpoint():
 
     # Return as csv_file
     csv_user_reports = user_reports_to_csv_format(user_reports)
+
+
+    return jsonify({"csv_user_reports": csv_user_reports, "user_reports": user_reports, "batch_id": batch_id }), 200
+
+# This one doesn't save to database, just generates the report and returns it
+@endpoints.route("/generate_report_display", methods=["POST"])
+@authenticate
+@bank_manager_authorization
+def generate_report_display_endpoint():
+    """
+    Endpoint to generate report batch.
+    """
+    user_reports = generate_user_reports()
+
+    # Get manager id
+    bank_manager = get_bank_manager(request.user['id'])
+    bank_manager_id = bank_manager['id']
+
+    # Add to database
+    # batch_id = insert_report_batch(bank_manager_id, user_reports)
+
+    # Return as csv_file
+    csv_user_reports = user_reports_to_csv_format(user_reports)
+
 
     return jsonify({"csv_user_reports": csv_user_reports, "user_reports": user_reports}), 200
 

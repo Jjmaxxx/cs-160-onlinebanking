@@ -137,11 +137,12 @@ export function ReportGenerator() {
   const [reportBatches, setReportBatches] = useState<ReportBatch[]>([]);
   const [userReports, setUserReports] = useState<UserReport[]>([]);
   const [selectedReportBatch, setSelectedReportBatch] = useState<ReportBatch | null>(null);
+  const [trigger, setTrigger] = useState(0);
+  const [triggerCurrentReport, setTriggerCurrentReport] = useState(0);
 
   // Grabs the specfic user report batch
   const reportBatchHandler = (id: string) => {
-    setSelectedReportBatch(reportBatches.find((batch) => batch.id === id) || null);
-
+    
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/user_reports_batch?batch_id=${id}`, {
       method: "GET",
       credentials: "include",
@@ -152,7 +153,7 @@ export function ReportGenerator() {
         console.log(data)
 
         // Fill data to userReports
-        const transformedData = data.map((report: any) => ({
+        const transformedData = data.user_reports.map((report: any) => ({
           user_id: report.user_id,
           full_name: report.full_name,
           total_accounts: report.total_accounts,
@@ -166,33 +167,81 @@ export function ReportGenerator() {
         setUserReports(transformedData);
       })
       .catch((error) => console.error("Fetch error:", error))
+
+      setSelectedReportBatch(reportBatches.find((batch) => batch.id === id) || null);
   }
 
-
-    // Grabs all reports
-    useEffect(() => {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/all_report_batches`, {
-        method: "GET",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      })
+  // Function to generate a new report
+  const generateNewReportHandler = () => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/generate_report`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    })
         .then((response) => response.json())
-        .then((d) => {
+        .then((data) => {
+            reportBatchHandler(data.batch_id); // Fetch the new report batch after generating it
 
-          console.log(d)
+            setTrigger((prev) => prev + 1); // Trigger a re-fetch of all report batches
+    })
+    .catch((error) => console.error("Fetch error:", error));
+  }
 
-          const transformedData = d.map((report: any) => ({
-            id: report.batch_id,
-            bank_manager_id: report.bank_manager_id,
-            email: report.email,
-            date: report.batch_created_at,
-          }));
-          setReportBatches(transformedData);
-          console.log(transformedData);
+  // Shows current report batch
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/generate_report_display`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            
 
-        })
-        .catch((error) => console.error("Fetch error:", error));
-    }, []);
+            // Fill data to userReports
+            const transformedData = data.user_reports.map((report: any) => ({
+              user_id: report.id,
+              full_name: report.full_name,
+              total_accounts: report.total_accounts,
+              total_balance: report.total_balance,
+              total_money_deposited: report.total_money_deposited,
+              total_money_received: report.total_money_received,
+              total_money_transferred: report.total_money_transferred,
+              total_money_withdrawn: report.total_money_withdrawn,
+              total_transactions: report.total_transactions,
+            }));
+            
+            console.log(transformedData);
+
+            setUserReports(transformedData);
+    })
+    .catch((error) => console.error("Fetch error:", error));
+
+
+    setSelectedReportBatch(null); // Reset selected report batch when generating a new report
+  }, [triggerCurrentReport]);
+
+  // Grabs all reports
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/bank_manager/all_report_batches`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((response) => response.json())
+      .then((d) => {
+
+        const transformedData = d.map((report: any) => ({
+          id: report.batch_id,
+          bank_manager_id: report.bank_manager_id,
+          email: report.email,
+          date: report.batch_created_at,
+        }));
+        setReportBatches(transformedData);
+
+      })
+      .catch((error) => console.error("Fetch error:", error));
+  }, [trigger, triggerCurrentReport]);
 
 
 
@@ -337,8 +386,12 @@ export function ReportGenerator() {
         </DropdownMenuContent>
         </DropdownMenu>
         <div className="flex items-center gap-2">
-        <Button variant="default" className="bg-black text-white">
-        Generate New Report
+        <Button
+          variant="default"
+          className="bg-black text-white"
+          onClick={generateNewReportHandler}
+        >
+          Generate New Report
         </Button>
         <Button variant="outline">
         <Download className="mr-2 h-4 w-4" />
@@ -414,7 +467,7 @@ export function ReportGenerator() {
       <CardHeader>
         <CardTitle>User Reports</CardTitle>
         <CardDescription>
-          User Reports for Report Batch: {selectedReportBatch ? selectedReportBatch.id : "None"}
+          User Reports for Report Batch: {selectedReportBatch ? selectedReportBatch.id : "Current"}
         </CardDescription>
       </CardHeader>
 
@@ -445,6 +498,13 @@ export function ReportGenerator() {
         </DropdownMenuContent>
         </DropdownMenu>
         <div className="flex items-center gap-2">
+        <Button
+          variant="default"
+          className="bg-black text-white"
+          onClick={() => setTriggerCurrentReport((prev) => prev + 1)}
+        >
+          See Current Report
+        </Button>
         <Button variant="outline">
         <Download className="mr-2 h-4 w-4" />
         Export

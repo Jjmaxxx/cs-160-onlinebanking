@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS user_reports(
     id INT AUTO_INCREMENT PRIMARY KEY,
     batch_id INT NOT NULL,
     user_id INT NOT NULL,
-    full_name VARCHAR(100) NOT NULL,
+    full_name VARCHAR(100),
     total_accounts INT DEFAULT 0,
     total_balance DECIMAL(15, 2) DEFAULT 0.00,
     total_transactions INT DEFAULT 0,
