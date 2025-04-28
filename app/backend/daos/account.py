@@ -317,3 +317,20 @@ def get_all_bill_payments(user_id: int):
         logger().debug("No bill payments found for user_id: %s", user_id)
     
     return payments
+
+def become_admin(user_id: int):
+    """
+    Update the user to become an admin.
+    """
+    query = '''
+        INSERT INTO bank_managers (user_id) VALUES (%s);
+    '''
+    
+    logger().debug("Updating user_id: %s to become admin", user_id)
+    
+    result = execute_query(query, (user_id,))
+    
+    if result:
+        logger().debug("User_id: %s is now an admin", user_id)
+    
+    return result

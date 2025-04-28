@@ -2,6 +2,7 @@ from db import fetch_all, execute_query, fetch_one
 from services.logger import logger
 import sys
 import time
+from decimal import Decimal
 
 """
 USER SCHEMA (for copilot to go off of):
@@ -214,10 +215,77 @@ def user_reports_to_csv_format(user_reports):
         ]) + "\n"
     return csv_data
 
+def get_all_transactions():
+    # get all transactions, joined with accounts and users
+    trasnactions = '''
+        SELECT t.*, a.account_type, a.balance, u.*
+        FROM transactions t
+        LEFT JOIN accounts a ON t.account_id = a.id
+        LEFT JOIN users u ON a.user_id = u.id
+        ORDER BY t.transaction_date DESC;
+    '''
+    return fetch_all(trasnactions)
+
+
+
+def summarize_transactions(transactions):
+    user_data = {}
+
+    for txn in transactions:
+        email = txn.get('email', 'unknown@example.com')
+        first_name = txn.get('first_name') or 'Unknown'
+        last_name = txn.get('last_name') or ''
+        full_name = f"{first_name} {last_name}".strip()
+
+        key = (email, full_name)
+
+        if key not in user_data:
+            user_data[key] = {
+                'email': email,
+                'full_name': full_name,
+                'address': txn.get('address'),
+                'city': txn.get('city'),
+                'state': txn.get('state'),
+                'zip_code': txn.get('zip_code'),
+                'number_of_accounts': set(),
+                'transactions': 0,
+                'money_moved': Decimal('0.0'),
+                'total_balance': Decimal('0.0')
+            }
+
+        user_data[key]['number_of_accounts'].add(txn.get('account_type'))
+        user_data[key]['transactions'] += 1
+        user_data[key]['money_moved'] += txn.get('amount', Decimal('0'))
+        user_data[key]['total_balance'] += txn.get('balance', Decimal('0'))
+
+    # Format the result into a list of dicts
+    result = []
+    for data in user_data.values():
+        result.append({
+            'email': data['email'],
+            'full_name': data['full_name'],
+            'address': data['address'],
+            'city': data['city'],
+            'state': data['state'],
+            'zip_code': data['zip_code'],
+            'number_of_accounts': len(data['number_of_accounts']),
+            'transactions': data['transactions'],
+            'money_moved': float(round(data['money_moved'], 2)),
+            'total_balance': float(round(data['total_balance'], 2))
+        })
+
+    return result
+
+
+    return result
+
 def insert_report_batch(_bank_manager_id, user_reports = None):
     """
     Insert a report batch with all the user reports.
     """
+
+    logger().debug("Result of get_all_transactions: %s", get_all_transactions())
+    logger().debug("Result of summarize_transactions: %s", summarize_transactions(get_all_transactions()))
 
     # Create report batch and store into db
     execute_query('''

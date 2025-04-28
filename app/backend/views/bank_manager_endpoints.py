@@ -1,8 +1,9 @@
 import flask
+from services.logger import logger
 import os
 from flask import Blueprint, jsonify, request
 from middlewares.auth_middleware import authenticate, bank_manager_authorization
-from daos.bank_manager import get_all_user_accounts, get_all_user_reports, get_report_batch, get_report_batches, insert_report_batch, generate_user_reports, get_bank_manager, get_all_users, user_reports_to_csv_format
+from daos.bank_manager import get_all_user_accounts, get_all_user_reports, get_report_batch, get_report_batches, insert_report_batch, generate_user_reports, get_bank_manager, get_all_users, user_reports_to_csv_format, summarize_transactions, get_all_transactions
 
 endpoints = Blueprint('bank_manager_endpoints', __name__)
 
@@ -92,3 +93,26 @@ def generate_report_endpoint():
     csv_user_reports = user_reports_to_csv_format(user_reports)
 
     return jsonify({"csv_user_reports": csv_user_reports, "user_reports": user_reports}), 200
+
+@endpoints.route("/summarize_transactions")
+@authenticate
+@bank_manager_authorization
+def summarize_transactions_endpoint():
+    transactions = summarize_transactions(get_all_transactions())
+
+    return jsonify(transactions), 200
+
+reports = []
+
+@endpoints.route("/save_report", methods=["POST"])
+def save_report():
+    data = request.get_json()
+    reports.append(data)
+    logger().debug(f"Received data: {data}")
+
+    return jsonify({"message": "Report saved successfully"}), 200
+
+@endpoints.route("/get_all_reports", methods=["GET", "POST"])
+def get_all_reports():
+    return jsonify(reports), 200
+

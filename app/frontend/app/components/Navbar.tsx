@@ -30,6 +30,24 @@ function Navbar() {
     }
   }
 
+  const handleAdmin = async () => {
+    try {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/become_admin`, {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((response) => response.json())
+        .then((_) => {
+          window.location.href = "/";
+        })
+        .catch((error) => console.error("Fetch error:", error));
+      } catch (error) {
+        console.error('Failed to log out:', error);
+      }
+  }
+
+
      return (<nav className="w-full bg-gray-900 text-white p-4 flex justify-between items-center shadow-md">
         <h1 className="text-xl font-bold">BANK</h1>
         <div className="space-x-4">
@@ -39,6 +57,7 @@ function Navbar() {
             <>
               <a href="/maps" className="hover:text-gray-400">Find ATMs</a>
               <a href="/user-form" className="hover:text-gray-400">Profile Information</a>
+              <a onClick={handleAdmin} className='hover:text-gray-400'>Become an Admin</a>
               {/* <a href="/transact" className="hover:text-gray-400">Transact</a> */}
               <a href="#" onClick={handleLogout} className="hover:text-gray-400">Logout</a>
             </>
