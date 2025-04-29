@@ -15,7 +15,6 @@ export function AccountDropdown({ accounts, selectedAccount, onChange }) {
     return `•••• ${String(number).slice(-4)}`
   }
 
-  // Format currency
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",

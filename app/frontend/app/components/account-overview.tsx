@@ -19,6 +19,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { AccountDropdown } from "./account-dropdown.jsx"
 
 interface Account {
   id: number
@@ -49,6 +50,7 @@ export function AccountOverview({
   const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false)
   const [accountToClose, setAccountToClose] = useState<number | null>(null)
   const [openPopoverId, setOpenPopoverId] = useState<number | null>(null)
+  const [selectedTransferAccount, setSelectedTransferAccount] = useState<Account | null>(null)
 
   useEffect(() => {
     fetchAccounts()
@@ -123,12 +125,18 @@ export function AccountOverview({
     setIsSubmitting(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts/close_account?account_id=${accountToClose}`, {
+      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/accounts/close_account`)
+      url.searchParams.append("account_id", accountToClose.toString())
+      if (selectedTransferAccount) {
+        url.searchParams.append("dest_account_id", selectedTransferAccount.id.toString())
+      }
+
+      const response = await fetch(url, {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-        }
+        },
       })
 
       if (!response.ok) {
@@ -138,6 +146,7 @@ export function AccountOverview({
       setIsCloseDialogOpen(false)
       setAccountToClose(null)
       setOpenPopoverId(null)
+      setSelectedTransferAccount(null)
       fetchAccounts()
 
       toast("Your account has been successfully closed.")
@@ -148,6 +157,21 @@ export function AccountOverview({
       setIsSubmitting(false)
     }
   }
+
+  // Find the account object by ID
+  const getAccountById = (id: number | null) => {
+    if (!id) return null
+    return accounts.find((account) => account.id === id) || null
+  }
+
+  // Get the account to close as an object
+  const accountToCloseObj = getAccountById(accountToClose)
+
+  // Get available accounts for transfer (all accounts except the one being closed)
+  const availableTransferAccounts = accounts.filter((account) => account.id !== accountToClose)
+
+  // Check if the account being closed has a balance
+  const hasBalance = accountToCloseObj && Number.parseFloat(accountToCloseObj.balance) > 0
 
   const renderAccountsList = (accounts: Account[], borderColor: string, accountType: string) => {
     if (accounts.length === 0) {
@@ -335,11 +359,45 @@ export function AccountOverview({
               Are you sure you want to close this account? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
+
+          {/* Show transfer options if account has balance */}
+          {hasBalance && (
+            <div className="py-4 space-y-4">
+              <div className="font-medium">
+                This account has a balance of {accountToCloseObj ? formatBalance(accountToCloseObj.balance) : "$0.00"}
+              </div>
+
+              {availableTransferAccounts.length > 0 ? (
+                <>
+                  <div className="text-sm text-muted-foreground mb-2">
+                    Please select an account to transfer the remaining balance to:
+                  </div>
+                  <AccountDropdown
+                    accounts={availableTransferAccounts}
+                    selectedAccount={selectedTransferAccount}
+                    onChange={setSelectedTransferAccount}
+                  />
+                </>
+              ) : (
+                <div className="text-amber-600 bg-amber-50 p-3 rounded-md border border-amber-200">
+                  Warning: You have no other accounts to transfer the funds to. If you close this account, the remaining
+                  balance will be forfeited.
+                </div>
+              )}
+            </div>
+          )}
+
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setIsCloseDialogOpen(false)} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button onClick={handleCloseAccount} disabled={isSubmitting} variant="destructive">
+            <Button
+              onClick={handleCloseAccount}
+              disabled={
+                isSubmitting || (hasBalance && availableTransferAccounts.length > 0 && !selectedTransferAccount)
+              }
+              variant="destructive"
+            >
               {isSubmitting ? "Closing..." : "Close Account"}
             </Button>
           </DialogFooter>

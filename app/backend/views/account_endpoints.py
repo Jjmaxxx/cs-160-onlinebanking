@@ -53,8 +53,9 @@ def close_account_endpoint():
     Endpoint to close an account by ID.
     """
     account_id = request.args.get('account_id')
+    dest_account_id = request.args.get('dest_account_id')
     try:
-        close_account(int(account_id))    
+        close_account(int(account_id), dest_account_id)    
     except Exception as e:
         return jsonify({"error": "Failed to close account"}), 400
     return jsonify({"message": "Account closed successfully"})
@@ -139,10 +140,11 @@ def bill_endpoint():
     bill_name = request.args.get('bill_name')
     amount = request.args.get('amount', type=float)
     due_date = int(request.args.get('due_date'))
+    dest_account_num = int(request.args.get('dest_account_num'))
     logger().debug("HERRRRRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEE")
 
     try:
-        add_bill_payment(int(account_id), bill_name, amount, due_date)
+        add_bill_payment(int(account_id), bill_name, amount, due_date, dest_account_num)
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -156,7 +158,8 @@ def get_bill_payments_endpoint():
     Endpoint to retrieve bill payments for an account.
     """
     account_id = request.args.get('account_id')
-    payments = get_bill_payments(int(account_id))
+    status = request.args.get('status')
+    payments = get_bill_payments(int(account_id), status)
 
     if not payments:
         return jsonify({"error": "No bill payments found for this account"}), 400

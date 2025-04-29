@@ -241,7 +241,7 @@ export function QuickActions({ accounts, fetchAccounts }) {
                       type="file"
                       accept="image/*"
                       onChange={handleFileChange}
-                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-0"
                     />
                     <div className="w-full h-24 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors p-3">
                       <Plus className="h-6 w-6 text-gray-400 mb-1" />

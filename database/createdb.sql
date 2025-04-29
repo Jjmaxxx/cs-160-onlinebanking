@@ -76,10 +76,12 @@ CREATE TABLE IF NOT EXISTS bill_payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     payee_name VARCHAR(255) NOT NULL,
     payee_account_id INT,
+    destination_account_id INT NOT NULL,
     amount DECIMAL(15, 2) NOT NULL CHECK (amount >= 0),
     bill_status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (payee_account_id) REFERENCES accounts(id) ON DELETE SET NULL
+    FOREIGN KEY (payee_account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (destination_account_id) REFERENCES accounts(id) ON DELETE CASCADE
 );
 
 

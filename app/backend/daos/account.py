@@ -125,7 +125,7 @@ def open_account(user_id: int, account_type: str = 'checking'):
     
     return result
 
-def close_account(id_: int):
+def close_account(id_: int, dest_account_id: int = None):
     """
     Close an account by setting its status to 'closed'.
     """
@@ -134,9 +134,15 @@ def close_account(id_: int):
         SET account_status = 'closed'
         WHERE id = %s;
     '''
-    print(id_)
-    logger().debug("Closing account for id: %s", id_)
-    
+    logger().debug("Closing account for id: %s", id_, "sending money to")
+    try:
+        dest_account_id = int(dest_account_id)
+        if dest_account_id:
+            account = get_account(id_)
+            transfer_funds(int(id_), int(dest_account_id), float(account.get('balance')))
+    except Exception as e:
+        print("Could not transfer funds.")
+        
     # Execute the query
     result = execute_query(query, (id_,))
     logger().debug("Account closed successfully for id: %s", id_)
@@ -220,6 +226,7 @@ def transfer_funds(source_account_id: int, destination_account_id: int, amount: 
         "Transferred %s from account id: %s to account id: %s",
         amount, source_account_id, destination_account_id
     )
+    return True
 
 def check_user_owns_account(user_id: int, account_id: int):
     """
@@ -259,41 +266,41 @@ def get_user_transactions(user_id: int):
     return transactions
 # add_bill_payment(int(account_id), bill_name, amount, due_date)
 
-def add_bill_payment(account_id: int, bill_name: str, amount: float, due_date: int):
+def add_bill_payment(account_id: int, bill_name: str, amount: float, due_date: int, dest_account_num: int):
     """
     Register a bill payment for an account. (due_date is unix timestamp)
     """
-
+    dest_account_id = int(get_account_by_number(dest_account_num).get("id"))
     query = '''
-        INSERT INTO bill_payments (payee_name, payee_account_id, amount, payment_date)
-        VALUES (%s, %s, %s, FROM_UNIXTIME(%s));
+        INSERT INTO bill_payments (payee_name, payee_account_id, amount, payment_date, destination_account_id)
+        VALUES (%s, %s, %s, FROM_UNIXTIME(%s), %s);
     '''
     
     logger().debug(
-        "Adding bill payment for account_id: %s, bill_name: %s, amount: %s, due_date: %s",
-        account_id, bill_name, amount, due_date
+        "Adding bill payment for account_id: %s, bill_name: %s, amount: %s, due_date: %s, dest account id: %s",
+        account_id, bill_name, amount, due_date, dest_account_id
     )
     
     # Execute the query
-    result = execute_query(query, (bill_name, account_id, amount, due_date))
+    result = execute_query(query, (bill_name, account_id, amount, due_date, dest_account_id))
     
     if result:
         logger().debug("Bill payment added successfully for account_id: %s", account_id)
     
     return result
 
-def get_bill_payments(account_id: int):
+def get_bill_payments(account_id: int, status: str = 'pending'):
     """
     Retrieve bill payments for an account.
     """
     query = '''
         SELECT * FROM bill_payments
-        WHERE payee_account_id = %s;
+        WHERE payee_account_id = %s AND bill_status = %s;
     '''
     
     logger().debug("Fetching bill payments for account_id: %s", account_id)
     
-    payments = fetch_all(query, (account_id,))
+    payments = fetch_all(query, (account_id, status))
     
     if not payments:
         logger().debug("No bill payments found for account_id: %s", account_id)
