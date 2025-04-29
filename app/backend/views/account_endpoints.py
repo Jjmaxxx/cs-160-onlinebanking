@@ -1,6 +1,9 @@
 from flask import Blueprint, jsonify, request
 from daos.user_info import user_id_by_email
 from services.logger import logger
+import requests
+import os
+
 
 
 
@@ -22,6 +25,8 @@ from services.account import (
 )
 from middlewares.auth_middleware import authenticate, account_authorization
 
+GOOGLE_MAPS_API_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
 
 endpoints = Blueprint('account_endpoints', __name__)
 
@@ -176,3 +181,20 @@ def get_all_bill_payments_endpoint():
         return jsonify({"error": "No bill payments found for this user"}), 400
 
     return jsonify(payments)
+
+@endpoints.route('/nearbysearch_proxy', methods=['GET'])
+def proxy_request():
+    print("Received request")
+    global cached_response
+    if not GOOGLE_MAPS_API_KEY:
+        return jsonify({"error": "Missing Google Maps API Key"}), 500
+    
+    params = request.args.to_dict()
+    params["key"] = GOOGLE_MAPS_API_KEY  # Ensure API key is included
+    
+    # if not cached_response:
+    response = requests.get(GOOGLE_MAPS_API_URL, params=params)
+    jsonresponse = response.json()
+    logger().debug("response json: %s", jsonresponse)
+
+    return jsonresponse, 200
