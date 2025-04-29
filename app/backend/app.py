@@ -10,6 +10,8 @@ from views.bank_manager_endpoints import endpoints as bank_manager_endpoints
 from middlewares.auth_middleware import authenticate
 from flask_apscheduler import APScheduler
 from scheduler_jobs import start_scheduler
+import requests
+from services.logger import logger
 
 load_dotenv()
 app = Flask(__name__)
@@ -42,22 +44,25 @@ cached_response = None
 def proxy_request():
     print("Received request")
     global cached_response
-    # if not GOOGLE_MAPS_API_KEY:
-    #     return jsonify({"error": "Missing Google Maps API Key"}), 500
+    if not GOOGLE_MAPS_API_KEY:
+        return jsonify({"error": "Missing Google Maps API Key"}), 500
     
-    # params = request.args.to_dict()
-    # params["key"] = GOOGLE_MAPS_API_KEY  # Ensure API key is included
+    params = request.args.to_dict()
+    params["key"] = GOOGLE_MAPS_API_KEY  # Ensure API key is included
     
     # if not cached_response:
-    #     response = requests.get(GOOGLE_MAPS_API_URL, params=params)
-    #     cached_response = response.json()
+    response = requests.get(GOOGLE_MAPS_API_URL, params=params)
+    jsonresponse = response.json()
+    logger().debug("response json: %s", jsonresponse)
+
+    return jsonify(jsonresponse), 200
     # else:
     #     app.logger.warn("Using cached response")
     
     # app.logger.warn("Returning response: %s", cached_response)
     with open("./sjsu_chase_atm_response.json", "r") as f:
         cached_response = f.read()
-    app.logger.warn("Returning response: %s", cached_response)
+    app.logger.warn("Returning response: %s", jsonresponse)
     return jsonify(cached_response)
 
 
