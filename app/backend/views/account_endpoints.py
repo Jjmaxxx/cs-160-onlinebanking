@@ -3,9 +3,7 @@ from daos.user_info import user_id_by_email
 from services.logger import logger
 import requests
 import os
-
-
-
+import functools
 
 from daos.account import (
     get_account,
@@ -185,6 +183,21 @@ def get_all_bill_payments_endpoint():
 
     return jsonify(payments)
 
+google_maps_cache = {}
+
+def google_map_request(params):
+    # convert params dict to hashable tuple
+    params_tuple = tuple(sorted(params.items()))
+    if params_tuple in google_maps_cache:
+        logger().debug("Cache hit for params: %s", params)
+        return google_maps_cache[params_tuple]
+    
+    logger().debug("Cache miss for params: %s", params)
+    response = requests.get(GOOGLE_MAPS_API_URL, params=params)
+    google_maps_cache[params_tuple] = response
+
+    return response
+
 @endpoints.route('/nearbysearch_proxy', methods=['GET'])
 def proxy_request():
     print("Received request")
@@ -196,8 +209,8 @@ def proxy_request():
     params["key"] = GOOGLE_MAPS_API_KEY  # Ensure API key is included
     
     # if not cached_response:
-    response = requests.get(GOOGLE_MAPS_API_URL, params=params)
+    response = google_map_request(params)
     jsonresponse = response.json()
-    logger().debug("response json: %s", jsonresponse)
+    #logger().debug("response json: %s", jsonresponse)
 
     return jsonresponse, 200
