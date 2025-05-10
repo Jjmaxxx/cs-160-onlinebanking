@@ -8,14 +8,38 @@ import {
   Pin,
   InfoWindow,
 } from "@vis.gl/react-google-maps";
+import {MapCameraChangedEvent, MapCameraProps} from '@vis.gl/react-google-maps';
+
 
 import Navbar from '../components/Navbar';
 
 const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
+function getDistanceInMiles(lat1, lon1, lat2, lon2) {
+  const R = 3958.8; // Radius of the Earth in miles
+  const toRadians = angle => angle * (Math.PI / 180);
+
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
+
 async function findChaseAtms(position: Position): Promise<PlacesResponse> {
-  const { lat, lng } = position;
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/accounts/nearbysearch_proxy?location=${lat},${lng}&radius=1000&type=atm&keyword=chase`;
+  var { lat, lng } = position;
+  // round to 3 decimal places
+  lat = Math.round(lat * 1000) / 1000;
+  lng = Math.round(lng * 1000) / 1000;
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/accounts/nearbysearch_proxy?location=${lat},${lng}&radius=3000&type=atm&keyword=chase`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -52,6 +76,8 @@ export default function Intro() {
   const [open, setOpen] = useState(false);
   const [selectedAtm, setSelectedAtm] = useState<Position | null>(null);
   const [findAtmResponse, setFindAtmResponse] = useState([]);
+  const [shouldShowSidebar, setShouldShowSidebar] = useState(false);
+  const [mapCamera, setMapCamera] = useState<Position | null>(null);
 
   useEffect(() => {
     console.log("Getting user location...");
@@ -61,6 +87,7 @@ export default function Intro() {
         async (pos) => {
           console.log("Getting user location...3");
           const { latitude, longitude } = pos.coords;
+          // round to 3 decimal places
           const userPosition = { lat: latitude, lng: longitude };
           setPosition(userPosition);
 
@@ -109,7 +136,28 @@ export default function Intro() {
       <div className="flex w-3/4 h-3/4 bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Map Section */}
         <div className="flex-1">
-          <Map zoom={15} center={position} mapId="3e43149384fef289">
+          <Map zoom={15} defaultCenter={position} mapId="3e43149384fef289" onCameraChanged={
+            (ev: MapCameraChangedEvent) => {
+            // console.log('camera changed', ev.detail)
+            console.log('camera changed', ev.detail)
+            setMapCamera({
+              lat: ev.detail.center.lat,
+              lng: ev.detail.center.lng,
+            });
+
+            const distanceFromCameraToUser = getDistanceInMiles(
+              ev.detail.center.lat,
+              ev.detail.center.lng,
+              position.lat,
+              position.lng
+            );
+
+            if (distanceFromCameraToUser > 5) {
+              setShouldShowSidebar(true);
+            } else {
+              setShouldShowSidebar(false);
+            }
+          }}>
             {/* User Location Marker */}
             <AdvancedMarker position={position} onClick={() => setOpen(true)}>
               <Pin background="grey" borderColor="green" glyphColor="purple" />
@@ -158,8 +206,33 @@ export default function Intro() {
         {atm.vicinity}
       </button>
     ))}
+    </div>
   </div>
-</div>
+  
+  {shouldShowSidebar && (
+  <div className="absolute bottom-20 left-8 w-80 bg-white rounded-xl shadow-lg p-4 overflow-y-auto max-h-[calc(100vh-100px)]">
+    <button
+      className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+      onClick={async () => {
+          const atmData = await findChaseAtms(mapCamera);
+          setFindAtmResponse(atmData.results);
+          console.log("atmData: ", atmData);
+          console.log("atmData.results: ", atmData.results);
+          console.log("atmData type", typeof atmData.results);
+          console.log("findAtmResponse: ", findAtmResponse);
+
+          const atmLocations = atmData.results.map((atm) => atm.geometry.location);
+          console.log("ATM LOCATIONS");
+          console.log(atmLocations);
+          setAtms(atmLocations);
+
+          setPosition(mapCamera);
+          setShouldShowSidebar(false);
+      }}>
+        Search Again
+    </button>
+  </div>
+  )}
 </>
 
 
