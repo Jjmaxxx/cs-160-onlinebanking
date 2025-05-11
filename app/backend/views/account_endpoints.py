@@ -149,7 +149,7 @@ def bill_endpoint():
     try:
         add_bill_payment(int(account_id), bill_name, amount, due_date, dest_account_num)
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"message": str(e)}), 400
 
     return jsonify({"message": "Bill payment registered successfully"})
 

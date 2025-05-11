@@ -286,6 +286,8 @@ def add_bill_payment(account_id: int, bill_name: str, amount: float, due_date: i
     
     if result:
         logger().debug("Bill payment added successfully for account_id: %s", account_id)
+    else:
+        raise ValueError("Error: Amount cannot be 0 or below.")
     
     return result
 
